@@ -21,8 +21,11 @@
     <div>
         Zynova on top
     </div>
-<script>
-    window.location.href = "https://zynovascripts.xyz/zynova.txt";
-</script>
+    if (window.location.pathname === '/icon.png') {
+    window.location.replace('https://zynovascripts.xyz');
+}
+if (window.location.pathname === '/zynova.txt') {
+    window.location.replace('https://zynovascripts.xyz');
+}
 </body>
 </html>
