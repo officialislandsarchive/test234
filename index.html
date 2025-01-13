@@ -47,6 +47,7 @@
             padding: 30px;
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         header h1 {
@@ -75,6 +76,26 @@
 
         nav a:hover {
             color: #ff99ee;
+        }
+
+        .discord-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #5865f2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .discord-button:hover {
+            background: #4752c4;
         }
 
         .container {
@@ -156,6 +177,31 @@
             transform: scale(1.05);
         }
 
+        .loadstring-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px auto;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .loadstring-container h3 {
+            font-size: 1.5rem;
+            color: #ff66cc;
+            margin-bottom: 10px;
+        }
+
+        .loadstring-container pre {
+            background: #1e1e1e;
+            color: #39ff14;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 1rem;
+            overflow-x: auto;
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -182,55 +228,58 @@
             <a href="#premium">Premium Scripts</a>
             <a href="#contact">Contact</a>
         </nav>
+        <a href="https://discord.gg/m6xTX6zNYK" class="discord-button" target="_blank">Join Discord</a>
     </header>
 
     <div class="container">
+        <!-- Free Scripts Section -->
         <section id="free" class="section">
             <h2>Free Scripts</h2>
             <div class="cards">
                 <div class="card">
-                    <img src="https://zynovascripts.xyz/images/freescript1.jpg" alt="Free Script 1">
                     <h3>Free Script #1</h3>
-                    <p>Amazing script for your Island adventures.</p>
-                    <a href="https://zynovascripts.xyz/download/freescript1.lua">Download</a>
+                    <div class="loadstring-container">
+                        <pre>loadstring(game:HttpGet("https://zynovascripts.xyz/freescript1.lua"))()</pre>
+                    </div>
                 </div>
                 <div class="card">
-                    <img src="https://zynovascripts.xyz/images/freescript2.jpg" alt="Free Script 2">
                     <h3>Free Script #2</h3>
-                    <p>Get the job done with this free script!</p>
-                    <a href="https://zynovascripts.xyz/download/freescript2.lua">Download</a>
+                    <div class="loadstring-container">
+                        <pre>loadstring(game:HttpGet("https://zynovascripts.xyz/freescript2.lua"))()</pre>
+                    </div>
                 </div>
+                <!-- Add more free scripts as needed -->
             </div>
         </section>
 
+        <!-- Premium Scripts Section -->
         <section id="premium" class="section">
             <h2>Premium Scripts</h2>
+            <p>To access premium scripts, please visit the purchasing page.</p>
             <div class="cards">
                 <div class="card">
-                    <img src="https://zynovascripts.xyz/images/premiumscript1.jpg" alt="Premium Script 1">
-                    <h3>Premium Script #1</h3>
-                    <p>Take your gameplay to the next level.</p>
-                    <a href="https://zynovascripts.xyz/premium">Buy Now</a>
-                </div>
-                <div class="card">
-                    <img src="https://zynovascripts.xyz/images/premiumscript2.jpg" alt="Premium Script 2">
-                    <h3>Premium Script #2</h3>
-                    <p>Dominate the game with this powerful script.</p>
-                    <a href="https://zynovascripts.xyz/premium">Buy Now</a>
+                    <h3>How to Buy</h3>
+                    <p>Click the button below to purchase premium scripts.</p>
+                    <a href="#purchase" class="buy-now-button">Go to Purchase Page</a>
                 </div>
             </div>
         </section>
 
+        <!-- Contact Section -->
         <section id="contact" class="section">
-                       <h2>Contact Us</h2>
-            <p>If you have any questions or need support, feel free to reach out to us.</p>
-            <p>Email: <a href="mailto:support@zynovascripts.xyz">support@zynovascripts.xyz</a></p>
-            <p>Join our Discord: <a href="https://discord.gg/zynovascripts" target="_blank">https://discord.gg/zynovascripts</a></p>
+            <h2>Contact</h2>
+            <p>If you have any questions or need support, feel free to reach out via Discord or through our upcoming social media platforms:</p>
+            <ul>
+                <li>Discord: <a href="https://discord.gg/m6xTX6zNYK" target="_blank">Join Us</a></li>
+                <!-- Placeholder for future social links -->
+                <li>Instagram: Coming Soon</li>
+                <li>YouTube: Coming Soon</li>
+            </ul>
         </section>
     </div>
 
     <footer>
-        <p>&copy; 2025 Zynova Scripts. All rights reserved. | <a href="https://zynovascripts.xyz/privacy-policy">Privacy Policy</a></p>
+        <p>© 2025 Zynova Scripts. All rights reserved. | <a href="#contact">Contact Us</a></p>
     </footer>
 </body>
 </html>
