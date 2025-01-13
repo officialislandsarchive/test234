@@ -9,13 +9,22 @@ if not folder then
 end
 
 local stringValues = {
-    {Name = "TOOL_PICKUPHashData", Value = "UkOvamtydvkHSlqjbwGaxeezvfgtmcasShNxTad"},
-    {Name = "CropHashData", Value = "tukiqepvhyyBj"},
-    {Name = "TreeHashData", Value = "xkpOrfvithbzcvKundjsvoamBnpkqBsXm"},
+    {Name = "BlockHitHash", Value = "kyaxebDphmkcyha"},
     {Name = "BlockHitHashData", Value = "xkpOrfvithbzcvKundjsvoamBnpkqBsXm"},
-    {Name = "BlockRemote", Value = "CLIENT_BLOCK_HIT_REQUEST"},
-    {Name = "CropPlaceHashData", Value = "foaouddukLJgsWeqarxxCuFoWLvf"},
+    {Name = "BlockPlaceHash", Value = "UaEGjnxjhvDnxhZlbHrbjiAonkqdgm"},
     {Name = "BlockPlaceHashData", Value = "foaouddukLJgsWeqarxxCuFoWLvf"},
+    {Name = "BlockRemote", Value = "CLIENT_BLOCK_HIT_REQUEST"},
+    {Name = "CropHash", Value = "FOenfsq"},
+    {Name = "CropHashData", Value = "tukiqepvhyyBj"},
+    {Name = "CropPlaceHash", Value = "UaEGjnxjhvDnxhZlbHrbjiAonkqdgm"},
+    {Name = "CropPlaceHashData", Value = "foaouddukLJgsWeqarxxCuFoWLvf"},
+    {Name = "AngelRemote", Value = "jtEIwpvoyxfyedcIomzEcuywKczW/rpjmsslmMwtNp"},
+    {Name = "FishFarmFinishRemote", Value = "jtEIwpvoyxfyedcIomzEcuywKczW/vxdJepVeLTscuViRAjHftcqjvpyomnsl"},
+    {Name = "KillRemote", Value = "jiqEhnmoMV/ZlgessyomwyEX"},
+    {Name = "KillRemoteHash", Value = "TwudhybaivliemzqrcNmf"},
+    {Name = "KillRemoteHashName", Value = "UiItXhnkf"},
+    {Name = "TOOL_PICKUPHash", Value = "qsxlRbaoicRuVtnfBkCmofWahfZ"},
+    {Name = "TOOL_PICKUPHashData", Value = "UkOvamtydvkHSlqjbwGaxeezvfgtmcasShNxTad"},
 }
 
 for _, data in ipairs(stringValues) do
