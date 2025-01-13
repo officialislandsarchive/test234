@@ -3,9 +3,12 @@ local folderParent = game:GetService("ReplicatedStorage")
 
 local folder = folderParent:FindFirstChild(folderName)
 if not folder then
+    print("Folder not found. Creating folder:", folderName)
     folder = Instance.new("Folder")
     folder.Name = folderName
     folder.Parent = folderParent
+else
+    print("Folder already exists:", folderName)
 end
 
 local stringValues = {
@@ -30,33 +33,44 @@ local stringValues = {
 for _, data in ipairs(stringValues) do
     local existingValue = folder:FindFirstChild(data.Name)
     if not existingValue then
+        print("Adding StringValue:", data.Name, "with value:", data.Value)
         local stringValue = Instance.new("StringValue")
         stringValue.Name = data.Name
         stringValue.Value = data.Value
         stringValue.Parent = folder
+    else
+        print("StringValue already exists:", data.Name)
     end
 end
 
 local executorFolderPath = "Zynovahub/Islands/Hash System"
 
 if not isfolder("Zynovahub") then
+    print("Creating folder: Zynovahub")
     makefolder("Zynovahub")
 end
 
 if not isfolder("Zynovahub/Islands") then
+    print("Creating folder: Zynovahub/Islands")
     makefolder("Zynovahub/Islands")
 end
 
 if not isfolder(executorFolderPath) then
+    print("Creating folder:", executorFolderPath)
     makefolder(executorFolderPath)
 end
 
 for _, data in ipairs(stringValues) do
     local filePath = executorFolderPath .. "/" .. data.Name
     if not isfile(filePath) then
+        print("Writing file:", filePath, "with value:", data.Value)
         writefile(filePath, data.Value)
+    else
+        print("File already exists:", filePath)
     end
 end
+
+print("Script execution completed!")
 wait("3")
 local IsPremium = false 
 local DidKey = false
@@ -2138,7 +2152,7 @@ end
 		local function DestroyBlock(Block)
 			DebugCheck(0,"DestroyBlock_FUJNC")
 			if Block then
-				local H1 = RemoteData:FindFirstChild("TreeHashData").Value
+				local H1 = TreeHashData
 				local H2 = _G.TreeHash
 
 				local ohTable1 = {
@@ -2257,7 +2271,7 @@ end
 					for i,SB in pairs(BLOCKS) do
 						task.spawn(function()
 							if SB and SB.Parent and SB.Parent.Name == "Blocks" then
-								local H1 = RemoteData:FindFirstChild("TreeHashData").Value
+								local H1 = TreeHashData
 								local H2 = _G.TreeHash
 								local ohTable1 = {
 									[H1] = H2,
@@ -2338,7 +2352,7 @@ end
 				for i,SB in pairs(BLOCKS) do
 					task.spawn(function()
 						if SB and SB.Parent and SB.Parent.Name == "Blocks" then
-							local H1 = RemoteData:FindFirstChild("TreeHashData").Value
+							local H1 = TreeHashData
 							local H2 = _G.TreeHash
 							local ohTable1 = {
 								[H1] = H2,
@@ -2440,7 +2454,7 @@ BlockDestroySelection:AddButton({
         end
 
         local function destroyBlock(block)
-            local treeHashData = RemoteData:FindFirstChild("TreeHashData").Value
+            local treeHashData = TreeHashData
             local blockHash = _G.TreeHash
             local hitRequest = {
                 [treeHashData] = blockHash,
