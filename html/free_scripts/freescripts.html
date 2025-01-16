@@ -286,42 +286,13 @@
     </div>
 
     <script>
-        const scriptData = [
-            {
-                title: "Awesome Script",
-                description: "A cool script for automation in your game.",
-                loadstring: "loadstring(game:HttpGet('https://example.com/script.lua'))",
-                icon: "https://via.placeholder.com/80",
-                status: "Active",
-                safety: "Safe",
-                updated: "2025-01-15"
-            },
-            {
-                title: "Cool Utility Script",
-                description: "A utility script to enhance your game.",
-                loadstring: "loadstring(game:HttpGet('https://example.com/utility.lua'))",
-                icon: "https://www.system-exodus.com/assets/images/gameimages/scriptimages/islands_free.gif",
-                status: "Active",
-                safety: "Safe",
-                updated: "2025-01-14"
-            },
-            {
-                title: "Epic Game Script",
-                description: "An epic script that will change the game.",
-                loadstring: "loadstring(game:HttpGet('https://example.com/epic.lua'))",
-                icon: "https://www.system-exodus.com/assets/images/gameimages/scriptimages/islands_free.gif",
-                status: "Inactive",
-                safety: "Unsafe",
-                updated: "2025-01-13"
-            }
-        ];
 
         function showScriptDetails(index) {
     const script = scriptData[index];
     document.getElementById('welcomeScreen').style.display = 'none';
     document.getElementById('scriptDetails').style.display = 'block';
     document.getElementById('scriptTitle').textContent = script.title;
-    document.getElementById('scriptIcon').src = script.icon; // Set the src attribute to the icon URL
+    document.getElementById('scriptIcon').src = script.icon;
     document.getElementById('loadstring').textContent = script.loadstring;
     document.getElementById('scriptDescription').textContent = script.description;
     document.getElementById('scriptStatus').textContent = `Status: ${script.status}`;
