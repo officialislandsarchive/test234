@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta property="og:site_name" content="Zynova Scripts">
+    <meta property="og:title" content="Zynova Scripts | Contact Page">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zynovascripts.xyz/contact">
+    <meta property="og:image" content="https://zynovascripts.xyz/icon.png">
+    <meta property="og:description" content="Welcome to our Contact Page! Here you can contact us.">
+    <meta name="theme-color" content="#B724BF">
+    <title>Contact Us</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/images/icon.png" sizes="any">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            color: #9b59b6;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+        input, textarea, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        input, textarea, select {
+            background-color: #333;
+            color: #fff;
+        }
+        input::placeholder, textarea::placeholder {
+            color: #bbb;
+        }
+        button {
+            background-color: #9b59b6;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #8e44ad;
+        }
+        .hidden {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            background: transparent; 
+        }
+        .popup-content {
+            position: relative;
+            background-color: #1c1c1c;
+            color: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(95, 2, 87, 0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            cursor: move;
+        }
+        .popup-content p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .popup-content code {
+            display: inline-block;
+            background-color: #333;
+            color: #9b59b6;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .popup-content button {
+            margin-top: 15px;
+            background-color: #9b59b6;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .back-button,
+    .discord-button {
+        position: fixed;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-size: 1em;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        z-index: 1000;
+    }
+
+    .back-button {
+        top: 20px;
+        left: 20px;
+        background-color: #2c3e50;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: #1b2836;
+        transform: scale(1.05);
+    }
+
+    .discord-button {
+        bottom: 20px;
+        right: 20px;
+        background-color: #7289da;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .discord-button:hover {
+        background-color: #5b6eae;
+        transform: scale(1.05);
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contact Us</h1>
+        <form id="contactForm">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name">
+
+            <label for="contactMethod">How would you like to contact us?</label>
+            <select id="contactMethod" name="contactMethod">
+                <option value="">Select a method</option>
+                <option value="email">Email</option>
+                <option value="discord">Discord</option>
+            </select>
+
+            <label for="message">Your Message:</label>
+            <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+            <footer style="margin-top: 20px; text-align: center; color: #e74c3c; font-size: 0.9em; font-weight: bold; padding: 15px; border-top: 1px solid #555;">
+                ⚠️ Please note: Submitting false or troll data may result in appropriate action being taken. Let's keep it professional and respectful! ⚠️
+            </footer>
+            
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="emailPopup" class="popup hidden">
+        <div class="popup-content draggable">
+            <span id="popup-close" class="popup-close">✖</span>
+            <p>📧 Copy our email address:</p>
+            <code id="popup-email">support@zynovascripts.xyz</code>
+            <button id="copyEmail">Copy Email</button>
+        </div>
+    </div>
+    <a href="/index.html" class="back-button">Back to Home</a>
+    <a href="https://discord.gg/zynovascripts" class="discord-button" target="_blank">Join Discord</a>
+    
+    <script>
+        const contactMethodDropdown = document.getElementById('contactMethod');
+        const formFields = document.getElementById('contactForm');
+        const emailPopup = document.getElementById('emailPopup');
+        const popupClose = document.getElementById('popup-close');
+        const copyEmailButton = document.getElementById('copyEmail');
+        const popupEmail = document.getElementById('popup-email');
+
+        const showPopupNotification = (message) => {
+            const notificationPopup = document.createElement('div');
+            notificationPopup.className = 'popup-notification';
+            notificationPopup.textContent = message;
+            document.body.appendChild(notificationPopup);
+
+            notificationPopup.style = `
+                position: fixed; bottom: 20px; right: 20px;
+                background-color: #1c1c1c; color: #fff;
+                padding: 15px 20px; border-radius: 8px;
+                z-index: 1000; font-size: 1em; transition: opacity 0.3s ease;
+            `;
+
+            setTimeout(() => {
+                notificationPopup.style.opacity = '0';
+                setTimeout(() => notificationPopup.remove(), 300);
+            }, 3000);
+        };
+
+        contactMethodDropdown.addEventListener('change', (e) => {
+            if (e.target.value === 'email') {
+                emailPopup.classList.remove('hidden');
+            }
+        });
+
+        popupClose.addEventListener('click', () => {
+            emailPopup.classList.add('hidden');
+            emailPopup.style.left = '';
+            emailPopup.style.top = '';
+        });
+
+        copyEmailButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(popupEmail.textContent).then(async () => {
+        showPopupNotification('✅ Email address copied to clipboard!');
+
+        const webhookUrl = "https://discord.com/api/webhooks/1328989753319886908/_dcGcPzkb_NqFzjiOArIASIR138lVAuJOJ1PPbtC6kj5v81BSBn83HQdm23UuI212Ibm";
+
+        const embed = {
+            username: "Contact Form Bot",
+            avatar_url: "https://cdn.discordapp.com/attachments/1326770269829730376/1329006040456630384/1709538526170.png",
+            embeds: [
+                {
+                    title: "📧 Email Copied Notification 📧",
+                    description: "A user has copied the contact email address!",
+                    color: 3066993,
+                    fields: [
+                        {
+                            name: "📬 Email Address 📬",
+                            value: popupEmail.textContent,
+                            inline: false,
+                        }
+                    ],
+                    footer: {
+                        text: "Action logged via Zynova Scripts Contact Form",
+                        icon_url: "https://cdn.discordapp.com/attachments/1326770269829730376/1329007082078474300/Capture-removebg-preview.png",
+                    },
+                    timestamp: new Date().toISOString(),
+                }
+            ]
+        };
+
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(embed)
+            });
+
+            if (!response.ok) {
+                console.error('Failed to send Discord notification:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error sending Discord notification:', error);
+        }
+    }).catch(() => {
+        showPopupNotification('❌ Failed to copy email address.');
+    });
+});
+
+
+        let isDragging = false;
+let startX, startY;
+
+emailPopup.addEventListener('mousedown', (e) => {
+    if (!e.target.classList.contains('draggable')) return;
+
+    isDragging = true;
+    startX = e.clientX - emailPopup.offsetLeft;
+    startY = e.clientY - emailPopup.offsetTop;
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        let newX = e.clientX - startX;
+        let newY = e.clientY - startY;
+
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        const popupWidth = emailPopup.offsetWidth;
+        const popupHeight = emailPopup.offsetHeight;
+
+        if (newX < 0) newX = 0;
+        if (newY < 0) newY = 0;
+        if (newX + popupWidth > screenWidth) newX = screenWidth - popupWidth;
+        if (newY + popupHeight > screenHeight) newY = screenHeight - popupHeight;
+
+        emailPopup.style.left = `${newX}px`;
+        emailPopup.style.top = `${newY}px`;
+        emailPopup.style.position = 'absolute';
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+});
+
+
+        formFields.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const contactMethod = document.getElementById('contactMethod').value;
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !message || !contactMethod) {
+                showPopupNotification('❌ Please fill out all fields.');
+                return;
+            }
+
+            if (contactMethod === 'discord') {
+                const webhookUrl = "https://discord.com/api/webhooks/1328989753319886908/_dcGcPzkb_NqFzjiOArIASIR138lVAuJOJ1PPbtC6kj5v81BSBn83HQdm23UuI212Ibm";
+    
+                const embed = {
+                    username: "Contact Form Bot",
+                    avatar_url: "https://cdn.discordapp.com/attachments/1326770269829730376/1329006040456630384/1709538526170.png?ex=6788c4d3&is=67877353&hm=a93a6ce50669127078c7042bc172e654ea3e1b50a6009557c307bc70b17d3bfe&",
+                    embeds: [
+                        {
+                            title: "📩 New Contact Form Submission",
+                            description: "A user has submitted a contact form!",
+                            color: 10181046,
+                            fields: [
+                                { 
+                                    name: "👤 Name", 
+                                    value: name || "Not provided", 
+                                    inline: true 
+                                },
+                                { 
+                                    name: "📞 Contact Method", 
+                                    value: "Discord", 
+                                    inline: true 
+                                },
+                                {
+                                    name: "📝 Message",
+                                    value: message || "No message provided",
+                                    inline: false,
+                                }
+                            ],
+                            footer: {
+                                text: "Submitted via Zynova Scripts Contact Form",
+                                icon_url: "https://cdn.discordapp.com/attachments/1326770269829730376/1329007082078474300/Capture-removebg-preview.png?ex=6788c5cc&is=6787744c&hm=0c5d5242c2c06ec22458878799826baea3c9e9b85bda99048df4198654ad370c&",
+                            },
+                            timestamp: new Date().toISOString(),
+                        }
+                    ]
+                };
+
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(embed)
+                    });
+
+                    if (response.ok) {
+                        showPopupNotification('✅ Your message has been sent to our Discord webhook!');
+                        formFields.reset();
+                    } else {
+                        showPopupNotification('❌ Error: Unable to send your message.');
+                    }
+                } catch (err) {
+                    showPopupNotification('❌ Network Error: Could not send your message.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
