@@ -23,7 +23,7 @@ local scriptLinks = {
 }
 
 local window = mainScript:CreateWindow({
-    Title = "Zynova Hub "..v..",
+    Title = "Zynova Hub" ..v,
     SubTitle = "Made by Albert",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
