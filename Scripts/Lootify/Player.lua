@@ -44,8 +44,14 @@ return function(tab)
         clearBodyVelocity()
     end
 
-    local playerSection = tab:AddSection("Player Features")
+    -- Safely create a section
+    local playerSection = tab.AddSection and tab:AddSection("Player Features")
+    if not playerSection then
+        Message("Error", "Failed to create Player section. Check your framework setup.", "Okay", 5)
+        return
+    end
 
+    -- Fly Speed Slider
     playerSection:AddSlider({
         Title = "Fly Speed",
         Min = 10,
@@ -56,6 +62,7 @@ return function(tab)
         end,
     })
 
+    -- Fly Toggle
     playerSection:AddToggle({
         Title = "Fly",
         Default = false,
@@ -71,6 +78,7 @@ return function(tab)
         end,
     })
 
+    -- NoClip Toggle
     playerSection:AddToggle({
         Title = "NoClip",
         Default = false,
@@ -98,6 +106,7 @@ return function(tab)
         end,
     })
 
+    -- Walk Speed Slider
     playerSection:AddSlider({
         Title = "Walk Speed",
         Min = 16,
@@ -109,6 +118,7 @@ return function(tab)
         end,
     })
 
+    -- Jump Power Slider
     playerSection:AddSlider({
         Title = "Jump Power",
         Min = 50,
@@ -120,6 +130,7 @@ return function(tab)
         end,
     })
 
+    -- Less Lag Button
     playerSection:AddButton({
         Title = "Less Lag",
         Description = "Removes the TerrainFolder from Workspace to reduce lag.",
