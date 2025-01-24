@@ -1,5 +1,8 @@
 return function(tab)
 
+_G.WalkSpeed = 30
+_G.JumpPower = 50
+
 IYMouse = game.Players.LocalPlayer:GetMouse()
 Players = game.Players
 iyflyspeed = 5
