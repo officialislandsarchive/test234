@@ -1,8 +1,16 @@
 return function(tab)
 
+function Message(Title1, Context1, ButtonText1, DurationTime)
+	Fluent:Notify({
+		Title = Title1,
+		Content = Context1,
+		Duration = DurationTime
+	})
+end
+
 local playerSection = tab:AddSection("Player Features")
 
-playerSection:AddSlider({
+local flySpeedSlider = playerSection:AddSlider({
     Title = "Fly Speed",
     Description = "",
     Min = 10,
@@ -14,62 +22,61 @@ playerSection:AddSlider({
     end,
 })
 
-
-    	local MobAutoFarmToggle = MobSelection:AddToggle("MobAutoFarmToggle", {Title = "Mob Auto Farm", Default = false })
-
-playerSection:AddToggle("FlyToggle", {Title = "Fly", Default = false })
-    Callback = function(state)
-        getgenv().flying = state
-        if flying then
-            local plr = game.Players.LocalPlayer
-            local char = plr.Character or plr.CharacterAdded:Wait()
-            local root = char:WaitForChild("HumanoidRootPart")
-            local bv = Instance.new("BodyVelocity", root)
-            bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-            bv.Velocity = Vector3.zero
-            getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
-                bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
-            end)
-        else
-            if getgenv().flyConn then
-                getgenv().flyConn:Disconnect()
-            end
-            for _, v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
-                if v:IsA("BodyVelocity") then
-                    v:Destroy()
-                end
+local flyToggle = playerSection:AddToggle("FlyToggle", { Title = "Fly", Default = false })
+flyToggle:OnChanged(function()
+    local state = flyToggle.Value
+    getgenv().flying = state
+    if flying then
+        local plr = game.Players.LocalPlayer
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        local root = char:WaitForChild("HumanoidRootPart")
+        local bv = Instance.new("BodyVelocity", root)
+        bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        bv.Velocity = Vector3.zero
+        getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
+            bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
+        end)
+        Message("Fly Enabled", "You are now flying!", "Got it!", 5)
+    else
+        if getgenv().flyConn then
+            getgenv().flyConn:Disconnect()
+        end
+        for _, v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
+            if v:IsA("BodyVelocity") then
+                v:Destroy()
             end
         end
-    end,
-})
+        Message("Fly Disabled", "You are no longer flying.", "Got it!", 5)
+    end
+end)
 
-playerSection:AddToggle({
-    Title = "NoClip",
-    Default = false,
-    Callback = function(state)
-        getgenv().noclip = state
-        if noclip then
-            getgenv().noclipConn = game:GetService("RunService").Stepped:Connect(function()
-                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                    if v:IsA("BasePart") then
-                        v.CanCollide = false
-                    end
-                end
-            end)
-        else
-            if getgenv().noclipConn then
-                getgenv().noclipConn:Disconnect()
-            end
+local noClipToggle = playerSection:AddToggle("NoClipToggle", { Title = "NoClip", Default = false })
+noClipToggle:OnChanged(function()
+    local state = noClipToggle.Value
+    getgenv().noclip = state
+    if noclip then
+        getgenv().noclipConn = game:GetService("RunService").Stepped:Connect(function()
             for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
                 if v:IsA("BasePart") then
-                    v.CanCollide = true
+                    v.CanCollide = false
                 end
             end
+        end)
+        Message("NoClip Enabled", "You can now walk through walls!", "Got it!", 5)
+    else
+        if getgenv().noclipConn then
+            getgenv().noclipConn:Disconnect()
         end
-    end,
-})
+        for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = true
+            end
+        end
+        Message("NoClip Disabled", "You can no longer walk through walls.", "Got it!", 5)
+    end
+end)
 
-playerSection:AddSlider({
+local walkSpeedSlider = playerSection:AddSlider({
     Title = "Walk Speed",
     Description = "",
     Min = 16,
@@ -81,7 +88,7 @@ playerSection:AddSlider({
     end,
 })
 
-playerSection:AddSlider({
+local jumpPowerSlider = playerSection:AddSlider({
     Title = "Jump Power",
     Description = "",
     Min = 50,
@@ -90,6 +97,20 @@ playerSection:AddSlider({
     Rounding = 0,
     Callback = function(v)
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
+    end,
+})
+
+local lessLagButton = playerSection:AddButton({
+    Title = "Less Lag",
+    Description = "Removes the TerrainFolder from Workspace to reduce lag.",
+    Callback = function()
+        local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
+        if terrainFolder then
+            terrainFolder:Destroy()
+            Message("Less Lag Applied", "The TerrainFolder was successfully removed.", "Got it!", 5)
+        else
+            Message("Less Lag", "TerrainFolder not found. Nothing to remove.", "Okay!", 5)
+        end
     end,
 })
 end
