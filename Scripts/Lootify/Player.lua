@@ -99,6 +99,18 @@ function sFLY(vfly)
     FLY()
 end
 
+	game:GetService("RunService").RenderStepped:Connect(function()
+		local Character = game.Players.LocalPlayer.Character 
+		if Character then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			if Humanoid then
+				Humanoid.WalkSpeed = _G.WalkSpeed or 30
+				Humanoid.JumpPower = _G.JumpPower or 50
+			end
+		end
+	end)
+
+	
 local playerCharacter = tab:AddSection("Player Character")
 
 local PlayerFly = playerCharacter:AddToggle("PlayerFly", {Title = "Fly", Default = false })
@@ -134,7 +146,7 @@ local FlySpeedSlider = playerCharacter:AddSlider("FlySpeedSlider", {
     	Max = 250,
     	Rounding = 1,
     	Callback = function(Value)
-        iyflyspeed = Value
+        	iyflyspeed = Value
     end
 })
 
