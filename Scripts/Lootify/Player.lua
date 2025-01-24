@@ -120,17 +120,17 @@ end
 		end
 	end)
 
-local FlySpeedSlider = Player:AddSlider("FlySpeedSlider", {
-    Title = "Fly Speed",
-    Description = "",
-    Default = 1,
-    Min = 1,
-    Max = 250,
-    Rounding = 1,
-    Callback = function(Value)
-        iyflyspeed = Value
-    end
-})
+	local FlySpeedSlider = Player:AddSlider("FlySpeedSlider", {
+    		Title = "Fly Speed",
+    		Description = "",
+    		Default = 5,
+    		Min = 1,
+    		Max = 250,
+    		Rounding = 1,
+    		Callback = function(Value)
+        		iyflyspeed = Value
+    		end
+	})
 
 	local JumpPowerSlider = Player:AddSlider("JumpPowerSlider", {
 		Title = "Jump Power",
