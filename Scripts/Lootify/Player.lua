@@ -3,6 +3,14 @@ return function(tab)
 _G.WalkSpeed = 30
 _G.JumpPower = 50
 
+function Message(Title1, Context1, ButtonText1, DurationTime)
+	Fluent:Notify({
+            Title = Title1,
+            Content = Context1,
+            Duration = DurationTime
+	})
+end
+	
 IYMouse = game.Players.LocalPlayer:GetMouse()
 Players = game.Players
 iyflyspeed = 5
@@ -176,4 +184,19 @@ local SpeedSlider = playerCharacter:AddSlider("SpeedSlider", {
 		_G.WalkSpeed = Value
 	end
 })
+
+local CopyLocationButton = playerCharacter:AddButton({
+        Title = "Copy Location",
+        Description = "Copies your current coordinates to the clipboard",
+        Callback = function()
+            if hrp then
+                local position = hrp.Position
+                local coords = string.format("Vector3.new(%.2f, %.2f, %.2f)", position.X, position.Y, position.Z)
+                setclipboard(coords)
+                Message("Location Copied", "Coordinates: " .. coords, "OK", 5)
+            else
+                Message("Error", "HumanoidRootPart not found!", "OK", 5)
+            end
+        end
+    })
 end
