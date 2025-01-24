@@ -2,7 +2,7 @@ return function(tab)
 
 IYMouse = game.Players.LocalPlayer:GetMouse()
 Players = game.Players
-iyflyspeed = 1
+iyflyspeed = 5
 
 function NOFLY()
     FLYING = false
@@ -129,7 +129,7 @@ end)
 local FlySpeedSlider = playerCharacter:AddSlider("FlySpeedSlider", {
 	Title = "Fly Speed",
     	Description = "",
-    	Default = 1,
+    	Default = 5,
     	Min = 1,
     	Max = 250,
     	Rounding = 1,
