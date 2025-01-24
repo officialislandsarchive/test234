@@ -14,9 +14,10 @@ playerSection:AddSlider({
     end,
 })
 
-playerSection:AddToggle({
-    Title = "Fly",
-    Default = false,
+
+    	local MobAutoFarmToggle = MobSelection:AddToggle("MobAutoFarmToggle", {Title = "Mob Auto Farm", Default = false })
+
+playerSection:AddToggle("FlyToggle", {Title = "Fly", Default = false })
     Callback = function(state)
         getgenv().flying = state
         if flying then
