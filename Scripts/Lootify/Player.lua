@@ -4,9 +4,11 @@ local playerSection = tab:AddSection("Player Features")
 
 playerSection:AddSlider({
     Title = "Fly Speed",
+    Description = "",
     Min = 10,
     Max = 150,
     Default = 50,
+    Rounding = 0,
     Callback = function(v)
         getgenv().flySpeed = v
     end,
@@ -68,9 +70,11 @@ playerSection:AddToggle({
 
 playerSection:AddSlider({
     Title = "Walk Speed",
+    Description = "",
     Min = 16,
     Max = 300,
     Default = 16,
+    Rounding = 0,
     Callback = function(v)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
     end,
@@ -78,9 +82,11 @@ playerSection:AddSlider({
 
 playerSection:AddSlider({
     Title = "Jump Power",
+    Description = "",
     Min = 50,
     Max = 300,
     Default = 50,
+    Rounding = 0,
     Callback = function(v)
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
     end,
