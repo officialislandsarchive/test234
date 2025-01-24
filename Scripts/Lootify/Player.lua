@@ -101,18 +101,19 @@ function sFLY(vfly)
     end)
     FLY()
 end
-	
+
 game:GetService("RunService").RenderStepped:Connect(function()
-	local Character = game.Players.LocalPlayer.Character 
-		if Character then
-		local Humanoid = Character:FindFirstChild("Humanoid")
-			if Humanoid then
-				Humanoid.WalkSpeed = _G.WalkSpeed or 30
-			Humanoid.JumpPower = _G.JumpPower or 50
-		end
-	end
+    local Character = game.Players.LocalPlayer.Character
+    if Character then
+        local Humanoid = Character:FindFirstChild("Humanoid")
+        if Humanoid then
+            Humanoid.WalkSpeed = _G.WalkSpeed or 30
+            Humanoid.UseJumpPower = true
+            Humanoid.JumpPower = _G.JumpPower or 50
+        end
+    end
 end)
-	
+
 local playerCharacter = tab:AddSection("Player Character")
 
 local PlayerFly = playerCharacter:AddToggle("PlayerFly", {Title = "Fly", Default = false })
@@ -146,22 +147,22 @@ local FlySpeedSlider = playerCharacter:AddSlider("FlySpeedSlider", {
     	Default = 5,
     	Min = 1,
     	Max = 250,
-    	Rounding = 1,
+    	Rounding = 0,
     	Callback = function(Value)
         	iyflyspeed = Value
     end
 })
 
 local JumpPowerSlider = playerCharacter:AddSlider("JumpPowerSlider", {
-	Title = "Jump Power",
-	Description = "",
-	Default = 50,
-	Min = 0,
-	Max = 500,
-	Rounding = 0,
-	Callback = function(Value)
-		_G.JumpPower = Value
-	end
+    Title = "Jump Power",
+    Description = "",
+    Default = 50,
+    Min = 0,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(Value)
+        _G.JumpPower = Value
+    end
 })
 
 local SpeedSlider = playerCharacter:AddSlider("SpeedSlider", {
