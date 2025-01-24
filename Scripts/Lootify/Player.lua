@@ -85,3 +85,4 @@ playerSection:AddSlider({
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
     end,
 })
+end
