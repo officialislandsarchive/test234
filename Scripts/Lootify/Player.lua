@@ -101,6 +101,15 @@ end
 
 local playerCharacter = tab:AddSection("Player Character")
 
+local PlayerFly = playerCharacter:AddToggle("PlayerFly", {Title = "Fly", Default = false })
+PlayerFly:OnChanged(function(Value)
+    if Value == true then
+        sFLY(true)
+    else
+        NOFLY()
+    end
+end)
+
 local FlyKeyBind = playerCharacter:AddKeybind("FlyKeyBind", {
     Title = "Fly Key",
     Mode = "Toggle",
@@ -116,16 +125,7 @@ local FlyKeyBind = playerCharacter:AddKeybind("FlyKeyBind", {
         print("Fly keybind changed to:", NewKey)
     end
 })
-
-local PlayerFly = playerCharacter:AddToggle("PlayerFly", {Title = "Fly", Default = false })
-PlayerFly:OnChanged(function(Value)
-    if Value == true then
-        sFLY(true)
-    else
-        NOFLY()
-    end
-end)
-
+	
 local FlySpeedSlider = playerCharacter:AddSlider("FlySpeedSlider", {
 	Title = "Fly Speed",
     	Description = "",
