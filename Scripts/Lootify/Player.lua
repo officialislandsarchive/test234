@@ -30,9 +30,19 @@ flyToggle:OnChanged(function()
         local plr = game.Players.LocalPlayer
         local char = plr.Character or plr.CharacterAdded:Wait()
         local root = char:WaitForChild("HumanoidRootPart")
-        local bv = Instance.new("BodyVelocity", root)
-        bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-        bv.Velocity = Vector3.zero
+
+        local bv = root:FindFirstChild("FlyBodyVelocity")
+        if not bv then
+            bv = Instance.new("BodyVelocity", root)
+            bv.Name = "FlyBodyVelocity"
+            bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+            bv.Velocity = Vector3.zero
+        end
+
+	if getgenv().flyConn then
+            getgenv().flyConn:Disconnect()
+        end
+
         getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
             bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
         end)
@@ -40,9 +50,10 @@ flyToggle:OnChanged(function()
     else
         if getgenv().flyConn then
             getgenv().flyConn:Disconnect()
+            getgenv().flyConn = nil
         end
         for _, v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
-            if v:IsA("BodyVelocity") then
+            if v:IsA("BodyVelocity") and v.Name == "FlyBodyVelocity" then
                 v:Destroy()
             end
         end
@@ -55,6 +66,10 @@ noClipToggle:OnChanged(function()
     local state = noClipToggle.Value
     getgenv().noclip = state
     if noclip then
+        if getgenv().noclipConn then
+            getgenv().noclipConn:Disconnect()
+        end
+
         getgenv().noclipConn = game:GetService("RunService").Stepped:Connect(function()
             for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
                 if v:IsA("BasePart") then
@@ -66,6 +81,7 @@ noClipToggle:OnChanged(function()
     else
         if getgenv().noclipConn then
             getgenv().noclipConn:Disconnect()
+            getgenv().noclipConn = nil
         end
         for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
             if v:IsA("BasePart") then
