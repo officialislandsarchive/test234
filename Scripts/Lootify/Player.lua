@@ -1,7 +1,5 @@
 return function(tab)
 
-local Player = tab:AddSection("Player Features")
-
 IYMouse = game.Players.LocalPlayer:GetMouse()
 Players = game.Players
 iyflyspeed = 1
@@ -101,28 +99,9 @@ function sFLY(vfly)
     FLY()
 end
 
-local PlayerFly = Player:AddToggle("PlayerFly", {Title = "Fly", Default = false })
-PlayerFly:OnChanged(function(Value)
-    if Value == true then
-        sFLY(true)
-    else
-        NOFLY()
-    end
-end)
+local playerCharacter = tab:AddSection("Player Character")
 
-local FlySpeedSlider = Player:AddSlider("FlySpeedSlider", {
-    Title = "Fly Speed",
-    Description = "",
-    Default = 1,
-    Min = 1,
-    Max = 250,
-    Rounding = 1,
-    Callback = function(Value)
-        iyflyspeed = Value
-    end
-})
-
-local FlyKeyBind = Player:AddKeybind("FlyKeyBind", {
+local FlyKeyBind = playerCharacter:AddKeybind("FlyKeyBind", {
     Title = "Fly Key",
     Mode = "Toggle",
     Default = "G",
@@ -138,39 +117,48 @@ local FlyKeyBind = Player:AddKeybind("FlyKeyBind", {
     end
 })
 
-	local JumpPowerSlider = Player:AddSlider("JumpPowerSlider", {
-		Title = "Jump Power",
-		Description = "",
-		Default = 50,
-		Min = 0,
-		Max = 500,
-		Rounding = 0,
-		Callback = function(Value)
-			_G.JumpPower = Value
-		end
-	})
+local PlayerFly = playerCharacter:AddToggle("PlayerFly", {Title = "Fly", Default = false })
+PlayerFly:OnChanged(function(Value)
+    if Value == true then
+        sFLY(true)
+    else
+        NOFLY()
+    end
+end)
 
-	local SpeedSlider = Player:AddSlider("SpeedSlider", {
-		Title = "Walk Speed",
-		Description = "",
-		Default = 30,
-		Min = 0,
-		Max = 100,
-		Rounding = 0,
-		Callback = function(Value)
-			_G.WalkSpeed = Value
-		end
-	})
+local FlySpeedSlider = playerCharacter:AddSlider("FlySpeedSlider", {
+	Title = "Fly Speed",
+    	Description = "",
+    	Default = 1,
+    	Min = 1,
+    	Max = 250,
+    	Rounding = 1,
+    	Callback = function(Value)
+        iyflyspeed = Value
+    end
+})
 
-    local lessLagButton = Player:AddButton({
-        Title = "Less Lag",
-        Description = "Removes the TerrainFolder from Workspace to reduce lag.",
-        Callback = function()
-            local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
-            if terrainFolder then
-                terrainFolder:Destroy()
-            else
-            end
-        end,
-    })
+local JumpPowerSlider = playerCharacter:AddSlider("JumpPowerSlider", {
+	Title = "Jump Power",
+	Description = "",
+	Default = 50,
+	Min = 0,
+	Max = 500,
+	Rounding = 0,
+	Callback = function(Value)
+		_G.JumpPower = Value
+	end
+})
+
+local SpeedSlider = playerCharacter:AddSlider("SpeedSlider", {
+	Title = "Walk Speed",
+	Description = "",
+	Default = 30,
+	Min = 0,
+	Max = 100,
+	Rounding = 0,
+	Callback = function(Value)
+		_G.WalkSpeed = Value
+	end
+})
 end
