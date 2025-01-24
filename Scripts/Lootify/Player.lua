@@ -44,9 +44,9 @@ return function(tab)
         clearBodyVelocity()
     end
 
-    tab:AddLabel({ Title = "Player Settings" })
+    local playerSection = tab:AddSection("Player Features")
 
-    tab:AddSlider({
+    playerSection:AddSlider({
         Title = "Fly Speed",
         Min = 10,
         Max = 150,
@@ -56,7 +56,7 @@ return function(tab)
         end,
     })
 
-    tab:AddToggle({
+    playerSection:AddToggle({
         Title = "Fly",
         Default = false,
         Callback = function(state)
@@ -71,7 +71,7 @@ return function(tab)
         end,
     })
 
-    tab:AddToggle({
+    playerSection:AddToggle({
         Title = "NoClip",
         Default = false,
         Callback = function(state)
@@ -98,7 +98,7 @@ return function(tab)
         end,
     })
 
-    tab:AddSlider({
+    playerSection:AddSlider({
         Title = "Walk Speed",
         Min = 16,
         Max = 300,
@@ -109,7 +109,7 @@ return function(tab)
         end,
     })
 
-    tab:AddSlider({
+    playerSection:AddSlider({
         Title = "Jump Power",
         Min = 50,
         Max = 300,
@@ -120,7 +120,7 @@ return function(tab)
         end,
     })
 
-    tab:AddButton({
+    playerSection:AddButton({
         Title = "Less Lag",
         Description = "Removes the TerrainFolder from Workspace to reduce lag.",
         Callback = function()
