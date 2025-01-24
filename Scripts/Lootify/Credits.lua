@@ -1,4 +1,13 @@
 return function(tab)
+
+function Message(Title1, Context1, ButtonText1, DurationTime)
+	Fluent:Notify({
+		Title = Title1,
+		Content = Context1,
+		Duration = DurationTime
+	})
+end
+    
     local credits = tab:AddSection("Credits")
 
     credits:AddParagraph({
@@ -19,6 +28,7 @@ return function(tab)
         Description = "Click to copy the Discord server link to your clipboard.",
         Callback = function()
             setclipboard("https://discord.gg/zynovascripts")
+                Message("Discord server link coiped to clipboard.")
         end
     })
 end
