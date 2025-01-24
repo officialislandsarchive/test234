@@ -1,13 +1,5 @@
 return function(tab)
 
-function Message(Title1, Context1, ButtonText1, DurationTime)
-	Fluent:Notify({
-		Title = Title1,
-		Content = Context1,
-		Duration = DurationTime
-	})
-end
-
 local playerSection = tab:AddSection("Player Features")
 
 playerSection:AddSlider({
@@ -35,7 +27,6 @@ playerSection:AddToggle({
             getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
                 bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
             end)
-            Message("Fly Enabled", "You are now flying!", "Got it!", 5)
         else
             if getgenv().flyConn then
                 getgenv().flyConn:Disconnect()
@@ -45,7 +36,6 @@ playerSection:AddToggle({
                     v:Destroy()
                 end
             end
-            Message("Fly Disabled", "You are no longer flying.", "Got it!", 5)
         end
     end,
 })
@@ -63,7 +53,6 @@ playerSection:AddToggle({
                     end
                 end
             end)
-            Message("NoClip Enabled", "You can now walk through walls!", "Got it!", 5)
         else
             if getgenv().noclipConn then
                 getgenv().noclipConn:Disconnect()
@@ -73,7 +62,6 @@ playerSection:AddToggle({
                     v.CanCollide = true
                 end
             end
-            Message("NoClip Disabled", "You can no longer walk through walls.", "Got it!", 5)
         end
     end,
 })
@@ -85,7 +73,6 @@ playerSection:AddSlider({
     Default = 16,
     Callback = function(v)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
-        Message("WalkSpeed Changed", "Your WalkSpeed is now " .. v, "Got it!", 5)
     end,
 })
 
@@ -96,7 +83,6 @@ playerSection:AddSlider({
     Default = 50,
     Callback = function(v)
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
-        Message("JumpPower Changed", "Your JumpPower is now " .. v, "Got it!", 5)
     end,
 })
 
@@ -107,9 +93,7 @@ playerSection:AddButton({
         local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
         if terrainFolder then
             terrainFolder:Destroy()
-            Message("Less Lag Applied", "The TerrainFolder was successfully removed.", "Got it!", 5)
         else
-            Message("Less Lag", "TerrainFolder not found. Nothing to remove.", "Okay!", 5)
         end
     end,
 })
