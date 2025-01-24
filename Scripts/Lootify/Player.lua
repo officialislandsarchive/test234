@@ -125,7 +125,7 @@ local FlySpeedSlider = Player:AddSlider("FlySpeedSlider", {
 local FlyKeyBind = Player:AddKeybind("FlyKeyBind", {
     Title = "Fly Key",
     Mode = "Toggle",
-    Default = Enum.KeyCode.G,
+    Default = "G",
     Callback = function()
         if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("BodyVelocity") then
             PlayerFly:SetValue(false)
