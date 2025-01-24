@@ -1,117 +1,136 @@
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local flying = false
-local noclip = false
+return function(tab)
 
-local function notify(title, description)
-    mainScript:Notify({
-        Title = title,
-        Description = description,
-        Duration = 5,
-    })
-end
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local flying = false
+    local noclip = false
+    local flySpeed = 50
+    local flyConnection
 
-tabs.Player:AddLabel({ Title = "Player Settings" })
+    local function Message(Title1, Context1, ButtonText1, DurationTime)
+        Fluent:Notify({
+            Title = Title1,
+            Content = Context1,
+            Duration = DurationTime
+        })
+    end
 
-local flySpeed = 50
-local flyConnection
-
-tabs.Player:AddSlider({
-    Title = "Fly Speed",
-    Min = 10,
-    Max = 150,
-    Default = 50,
-    Callback = function(v)
-        flySpeed = v
-    end,
-})
-
-tabs.Player:AddToggle({
-    Title = "Fly",
-    Default = false,
-    Callback = function(state)
-        flying = state
-        if flying then
-            local bv = Instance.new("BodyVelocity")
-            bv.Velocity = Vector3.zero
-            bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
-            bv.Parent = character.HumanoidRootPart
-
-            flyConnection = game:GetService("RunService").Heartbeat:Connect(function()
-                local moveDirection = Vector3.zero
-                if humanoid.MoveDirection.Magnitude > 0 then
-                    moveDirection = humanoid.MoveDirection
-                end
-                bv.Velocity = moveDirection * flySpeed
-            end)
-        else
-            if flyConnection then
-                flyConnection:Disconnect()
-            end
-            for _, v in pairs(character.HumanoidRootPart:GetChildren()) do
-                if v:IsA("BodyVelocity") then
-                    v:Destroy()
-                end
+    local function clearBodyVelocity()
+        for _, v in pairs(character.HumanoidRootPart:GetChildren()) do
+            if v:IsA("BodyVelocity") then
+                v:Destroy()
             end
         end
-    end,
-})
+    end
 
-tabs.Player:AddToggle({
-    Title = "Noclip",
-    Default = false,
-    Callback = function(state)
-        noclip = state
-        if noclip then
-            game:GetService("RunService").Stepped:Connect(function()
-                if noclip and character then
-                    for _, v in pairs(character:GetDescendants()) do
-                        if v:IsA("BasePart") and v.CanCollide then
-                            v.CanCollide = false
+    local function startFlying()
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = Vector3.zero
+        bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+        bv.Parent = character.HumanoidRootPart
+
+        flyConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            local moveDirection = humanoid.MoveDirection
+            bv.Velocity = moveDirection * flySpeed
+        end)
+    end
+
+    local function stopFlying()
+        if flyConnection then
+            flyConnection:Disconnect()
+            flyConnection = nil
+        end
+        clearBodyVelocity()
+    end
+
+    tab:AddLabel({ Title = "Player Settings" })
+
+    tab:AddSlider({
+        Title = "Fly Speed",
+        Min = 10,
+        Max = 150,
+        Default = 50,
+        Callback = function(v)
+            flySpeed = v
+        end,
+    })
+
+    tab:AddToggle({
+        Title = "Fly",
+        Default = false,
+        Callback = function(state)
+            flying = state
+            if flying then
+                startFlying()
+                Message("Fly Enabled", "You are now flying!", "Got it!", 5)
+            else
+                stopFlying()
+                Message("Fly Disabled", "You are no longer flying.", "Got it!", 5)
+            end
+        end,
+    })
+
+    tab:AddToggle({
+        Title = "NoClip",
+        Default = false,
+        Callback = function(state)
+            noclip = state
+            if noclip then
+                game:GetService("RunService").Stepped:Connect(function()
+                    if noclip and character then
+                        for _, v in pairs(character:GetDescendants()) do
+                            if v:IsA("BasePart") and v.CanCollide then
+                                v.CanCollide = false
+                            end
                         end
                     end
+                end)
+                Message("NoClip Enabled", "You can now walk through walls!", "Got it!", 5)
+            else
+                for _, v in pairs(character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
                 end
-            end)
-        else
-            for _, v in pairs(character:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = true
-                end
+                Message("NoClip Disabled", "You can no longer walk through walls.", "Got it!", 5)
             end
-        end
-    end,
-})
+        end,
+    })
 
-tabs.Player:AddSlider({
-    Title = "Walk Speed",
-    Min = 16,
-    Max = 300,
-    Default = 16,
-    Callback = function(v)
-        humanoid.WalkSpeed = v
-    end,
-})
+    tab:AddSlider({
+        Title = "Walk Speed",
+        Min = 16,
+        Max = 300,
+        Default = 16,
+        Callback = function(v)
+            humanoid.WalkSpeed = v
+            Message("WalkSpeed Changed", "Your WalkSpeed is now " .. v, "Got it!", 5)
+        end,
+    })
 
-tabs.Player:AddSlider({
-    Title = "Jump Power",
-    Min = 50,
-    Max = 300,
-    Default = 50,
-    Callback = function(v)
-        humanoid.JumpPower = v
-    end,
-})
+    tab:AddSlider({
+        Title = "Jump Power",
+        Min = 50,
+        Max = 300,
+        Default = 50,
+        Callback = function(v)
+            humanoid.JumpPower = v
+            Message("JumpPower Changed", "Your JumpPower is now " .. v, "Got it!", 5)
+        end,
+    })
 
-tabs.Player:AddButton({
-    Title = "Less Lag",
-    Callback = function()
-        local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
-        if terrainFolder then
-            terrainFolder:Destroy()
-            notify("Success", "Terrain Folder removed successfully!")
-        else
-            notify("Error", "Terrain Folder not found.")
-        end
-    end,
-})
+    tab:AddButton({
+        Title = "Less Lag",
+        Description = "Removes the TerrainFolder from Workspace to reduce lag.",
+        Callback = function()
+            local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
+            if terrainFolder then
+                terrainFolder:Destroy()
+                Message("Less Lag Applied", "The TerrainFolder was successfully removed.", "Got it!", 5)
+            else
+                Message("Less Lag", "TerrainFolder not found. Nothing to remove.", "Okay!", 5)
+            end
+        end,
+    })
+end
