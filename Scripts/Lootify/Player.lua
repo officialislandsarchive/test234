@@ -1,132 +1,170 @@
 return function(tab)
 
-function Message(Title1, Context1, ButtonText1, DurationTime)
-    if not Fluent then
-        error("Fluent library is not initialized.")
-    end
-    Fluent:Notify({
-        Title = Title1 or "No Title",
-        Content = Context1 or "No Content",
-        Duration = DurationTime or 5
-    })
+local Player = tab:AddSection("Player Features")
+
+IYMouse = game.Players.LocalPlayer:GetMouse()
+Players = game.Players
+iyflyspeed = 1
+function NOFLY()
+	FLYING = false
+	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
+	if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+		Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	end
+	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 end
 
-local playerSection = tab:AddSection("Player Features")
+function sFLY(vfly)
+	repeat wait() until IYMouse
+	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
+	T = Players.LocalPlayer.Character.HumanoidRootPart
+	CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+	lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+	SPEED = 0
+	local function FLY()
+		FLYING = true
+		local BG = Instance.new('BodyGyro')
+		local BV = Instance.new('BodyVelocity')
+		BG.P = 9e4
+		BG.Parent = T
+		BV.Parent = T
+		BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+		BG.cframe = T.CFrame
+		BV.velocity = Vector3.new(0, 0, 0)
+		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+		task.spawn(function()
+			repeat wait()
+				if not vfly and Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+					Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+				end
+				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
+					SPEED = iyflyspeed * 10 -- Dynamically set speed based on slider
+				elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0) and SPEED ~= 0 then
+					SPEED = 0
+				end
+				if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 or (CONTROL.Q + CONTROL.E) ~= 0 then
+					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + 
+					((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, 
+					(CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+					lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
+				elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
+					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + 
+					((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, 
+					(lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+				else
+					BV.velocity = Vector3.new(0, 0, 0)
+				end
+				BG.cframe = workspace.CurrentCamera.CoordinateFrame
+			until not FLYING
+			CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+			lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+			SPEED = 0
+			BG:Destroy()
+			BV:Destroy()
+			if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+				Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+			end
+		end)
+	end
+	flyKeyDown = IYMouse.KeyDown:Connect(function(KEY)
+		if KEY:lower() == 'w' then
+			CONTROL.F = 1
+		elseif KEY:lower() == 's' then
+			CONTROL.B = -1
+		elseif KEY:lower() == 'a' then
+			CONTROL.L = -1
+		elseif KEY:lower() == 'd' then 
+			CONTROL.R = 1
+		elseif QEfly and KEY:lower() == 'e' then
+			CONTROL.Q = 1
+		elseif QEfly and KEY:lower() == 'q' then
+			CONTROL.E = -1
+		end
+		pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
+	end)
+	flyKeyUp = IYMouse.KeyUp:Connect(function(KEY)
+		if KEY:lower() == 'w' then
+			CONTROL.F = 0
+		elseif KEY:lower() == 's' then
+			CONTROL.B = 0
+		elseif KEY:lower() == 'a' then
+			CONTROL.L = 0
+		elseif KEY:lower() == 'd' then
+			CONTROL.R = 0
+		elseif KEY:lower() == 'e' then
+			CONTROL.Q = 0
+		elseif KEY:lower() == 'q' then
+			CONTROL.E = 0
+		end
+	end)
+	FLY()
+end
 
-local flySpeedSlider = playerSection:AddSlider({
+	game:GetService("RunService").RenderStepped:Connect(function()
+		local Character = game.Players.LocalPlayer.Character 
+		if Character then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			if Humanoid then
+				Humanoid.WalkSpeed = _G.WalkSpeed or 30
+				Humanoid.JumpPower = _G.JumpPower or 50
+			end
+		end
+	end)
+
+	local PlayerFly = Player:AddToggle("PlayerFly", {Title = "Fly", Default = false })
+	PlayerFly:OnChanged(function(Value)
+		if Value == true then
+			sFLY(true)
+		else
+			NOFLY()
+		end
+	end)
+
+local FlySpeedSlider = Player:AddSlider("FlySpeedSlider", {
     Title = "Fly Speed",
     Description = "",
-    Min = 10,
-    Max = 150,
-    Default = 50,
-    Rounding = 0,
-    Callback = function(v)
-        getgenv().flySpeed = v
-    end,
-})
-
-local flyToggle = playerSection:AddToggle("FlyToggle", { Title = "Fly", Default = false })
-flyToggle:OnChanged(function()
-    local state = flyToggle.Value
-    getgenv().flying = state
-    if flying then
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        local root = char:WaitForChild("HumanoidRootPart")
-        local bv = root:FindFirstChild("FlyBodyVelocity")
-        if not bv then
-            bv = Instance.new("BodyVelocity", root)
-            bv.Name = "FlyBodyVelocity"
-            bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-            bv.Velocity = Vector3.zero
-        end
-        if getgenv().flyConn then
-            getgenv().flyConn:Disconnect()
-        end
-        getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
-            bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
-        end)
-        Message("Fly Enabled", "You are now flying!", "Got it!", 5)
-    else
-        if getgenv().flyConn then
-            getgenv().flyConn:Disconnect()
-            getgenv().flyConn = nil
-        end
-        for _, v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
-            if v:IsA("BodyVelocity") and v.Name == "FlyBodyVelocity" then
-                v:Destroy()
-            end
-        end
-        Message("Fly Disabled", "You are no longer flying.", "Got it!", 5)
+    Default = 1,
+    Min = 1,
+    Max = 250,
+    Rounding = 1,
+    Callback = function(Value)
+        iyflyspeed = Value
     end
-end)
+})
 
-local noClipToggle = playerSection:AddToggle("NoClipToggle", { Title = "NoClip", Default = false })
-noClipToggle:OnChanged(function()
-    local state = noClipToggle.Value
-    getgenv().noclip = state
-    if noclip then
-        if getgenv().noclipConn then
-            getgenv().noclipConn:Disconnect()
-        end
+	local JumpPowerSlider = Player:AddSlider("JumpPowerSlider", {
+		Title = "Jump Power",
+		Description = "",
+		Default = 50,
+		Min = 0,
+		Max = 500,
+		Rounding = 0,
+		Callback = function(Value)
+			_G.JumpPower = Value
+		end
+	})
 
-        getgenv().noclipConn = game:GetService("RunService").Stepped:Connect(function()
-            for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = false
-                end
+	local SpeedSlider = Player:AddSlider("SpeedSlider", {
+		Title = "Walk Speed",
+		Description = "",
+		Default = 30,
+		Min = 0,
+		Max = 100,
+		Rounding = 0,
+		Callback = function(Value)
+			_G.WalkSpeed = Value
+		end
+	})
+
+    local lessLagButton = Player:AddButton({
+        Title = "Less Lag",
+        Description = "Removes the TerrainFolder from Workspace to reduce lag.",
+        Callback = function()
+            local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
+            if terrainFolder then
+                terrainFolder:Destroy()
+            else
             end
-        end)
-        Message("NoClip Enabled", "You can now walk through walls!", "Got it!", 5)
-    else
-        if getgenv().noclipConn then
-            getgenv().noclipConn:Disconnect()
-            getgenv().noclipConn = nil
-        end
-        for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.CanCollide = true
-            end
-        end
-        Message("NoClip Disabled", "You can no longer walk through walls.", "Got it!", 5)
-    end
-end)
-
-local walkSpeedSlider = playerSection:AddSlider({
-    Title = "Walk Speed",
-    Description = "",
-    Min = 16,
-    Max = 300,
-    Default = 16,
-    Rounding = 0,
-    Callback = function(v)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
-    end,
-})
-
-local jumpPowerSlider = playerSection:AddSlider({
-    Title = "Jump Power",
-    Description = "",
-    Min = 50,
-    Max = 300,
-    Default = 50,
-    Rounding = 0,
-    Callback = function(v)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
-    end,
-})
-
-local lessLagButton = playerSection:AddButton({
-    Title = "Less Lag",
-    Description = "Removes the TerrainFolder from Workspace to reduce lag.",
-    Callback = function()
-        local terrainFolder = game.Workspace:FindFirstChild("TerrainFolder")
-        if terrainFolder then
-            terrainFolder:Destroy()
-            Message("Less Lag Applied", "The TerrainFolder was successfully removed.", "Got it!", 5)
-        else
-            Message("Less Lag", "TerrainFolder not found. Nothing to remove.", "Okay!", 5)
-        end
-    end,
-})
+        end,
+    })
 end
