@@ -28,7 +28,7 @@ end
         Description = "Click to copy the Discord server link to your clipboard.",
         Callback = function()
             setclipboard("https://discord.gg/zynovascripts")
-                Message("Discord server link coiped to clipboard.")
+		Message("Discord Link Copied!", "The Discord link has been successfully copied.", "Got it!", "5")
         end
     })
 end
