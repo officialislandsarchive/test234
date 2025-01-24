@@ -152,7 +152,7 @@ world3Bosses:AddDropdown("World3BossesDropdown", {
     
     local potionMage = tab:AddSection("Potion Mage")
     potionMage:AddButton({
-        Title = "Potion Mage",
+        Title = "Potion Mage Teleport (Bypass)",
         Description = "Teleport To the Potion Mage",
         Callback = function()
             local function tpToNPC()
