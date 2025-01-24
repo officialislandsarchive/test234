@@ -11,10 +11,6 @@ end
     local credits = tab:AddSection("Credits")
 
     credits:AddParagraph({
-        Title = "Executor", 
-        Content = "Lootify - Integrated with Zynova Hub V1, providing w shit for enhanced gameplay.",
-    })
-    credits:AddParagraph({
         Title = "Developer", 
         Content = "Developed by Albert",
     })
