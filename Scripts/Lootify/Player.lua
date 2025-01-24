@@ -1,13 +1,14 @@
 return function(tab)
-	
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
 
 function Message(Title1, Context1, ButtonText1, DurationTime)
-	Fluent:Notify({
-		Title = Title1,
-		Content = Context1,
-		Duration = DurationTime
-	})
+    if not Fluent then
+        error("Fluent library is not initialized.")
+    end
+    Fluent:Notify({
+        Title = Title1 or "No Title",
+        Content = Context1 or "No Content",
+        Duration = DurationTime or 5
+    })
 end
 
 local playerSection = tab:AddSection("Player Features")
@@ -32,7 +33,6 @@ flyToggle:OnChanged(function()
         local plr = game.Players.LocalPlayer
         local char = plr.Character or plr.CharacterAdded:Wait()
         local root = char:WaitForChild("HumanoidRootPart")
-
         local bv = root:FindFirstChild("FlyBodyVelocity")
         if not bv then
             bv = Instance.new("BodyVelocity", root)
@@ -40,11 +40,9 @@ flyToggle:OnChanged(function()
             bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
             bv.Velocity = Vector3.zero
         end
-
-	if getgenv().flyConn then
+        if getgenv().flyConn then
             getgenv().flyConn:Disconnect()
         end
-
         getgenv().flyConn = game:GetService("RunService").Heartbeat:Connect(function()
             bv.Velocity = (plr.Character:WaitForChild("Humanoid").MoveDirection * flySpeed)
         end)
