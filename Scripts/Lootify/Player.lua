@@ -1,4 +1,6 @@
 return function(tab)
+	
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
 
 function Message(Title1, Context1, ButtonText1, DurationTime)
 	Fluent:Notify({
