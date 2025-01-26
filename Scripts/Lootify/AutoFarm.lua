@@ -52,7 +52,7 @@ return function(tab)
         if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
             local billboard = npcModel.HumanoidRootPart:FindFirstChild("BillboardGui")
             if billboard then
-                local frame = billboard:FindFirstChild("Frame")
+                               local frame = billboard:FindFirstChild("Frame")
                 if frame then
                     local cooldownLabel = frame:FindFirstChild("CD")
                     if cooldownLabel and tonumber(cooldownLabel.Text) == 0 then
@@ -129,8 +129,10 @@ return function(tab)
                         end
                     else
                         print("WARNING: No enemies found, checking for boss...")
-                        local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal
-                        if not regionUI.Visible and regionUI.Parent.Boss.Visible then
+                        local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region
+                        if regionUI.Normal.Visible then
+                            print("DEBUG: Normal stage detected, farming enemies.")
+                        elseif regionUI.Boss.Visible then
                             print("DEBUG: Boss stage detected, teleporting.")
                             teleportToBoss(boss)
                         end
@@ -144,33 +146,32 @@ return function(tab)
         print("DEBUG: Auto farm loop stopped.")
     end
 
-    local function attackEnemies()
-        local enemyFolder = workspace:FindFirstChild("Enemy")
-        if enemyFolder and #enemyFolder:GetChildren() > 0 then
-            for _, enemy in ipairs(enemyFolder:GetChildren()) do
-                if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
-                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                                       if hrp then
-                        print("DEBUG: Attacking enemy:", enemy.Name)
-                        while enemy.Humanoid.Health > 0 and autoFarmEnabled do
-                            hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
-                            mouse1click()  -- Ensure mouse1click is defined elsewhere in your code
-                            task.wait(0.1)
-                        end
+local function attackEnemies()
+    local enemyFolder = workspace:FindFirstChild("Enemy")
+    if enemyFolder and #enemyFolder:GetChildren() > 0 then
+        for _, enemy in ipairs(enemyFolder:GetChildren()) do
+            if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
+                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    print("DEBUG: Attacking enemy:", enemy.Name)
+                    while enemy.Humanoid.Health > 0 and autoFarmEnabled do
+                        hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
+                        mouse1click()
+                        task.wait(0.1)
                     end
                 end
             end
-        else
-            print("WARNING: No enemies found. Moving to boss.")
-            if selectedIsland and selectedDifficulties[1] then
-                local boss = bossIds[selectedIsland][selectedDifficulties[1]]
-                if boss then
-                    teleportToBoss(boss)
-                end
+        end
+    else
+        print("WARNING: No enemies found. Moving to boss.")
+        if selectedIsland and selectedDifficulties[1] then
+            local boss = bossIds[selectedIsland][selectedDifficulties[1]]
+            if boss then
+                teleportToBoss(boss)
             end
         end
     end
-
+end
     -- UI Setup
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
 
