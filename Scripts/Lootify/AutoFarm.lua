@@ -150,6 +150,7 @@ return function(tab)
         Description = "Select The Difficulty type you want to fight.",
         Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Multi = true,
+        Default = {"Starter", "Medium"},
         Callback = function(values)
             selectedDifficulties = values or {}
             print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
