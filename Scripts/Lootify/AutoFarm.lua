@@ -1,8 +1,8 @@
 return function(tab)
     local selectedIsland = nil
-    local selectedDifficulties = {} -- Always initialized as an empty table
+    local selectedDifficulties = {}
     local farmingMethod = nil
-    local farmingDistance = -5 -- Default farming distance
+    local farmingDistance = -5
     local autoFarmEnabled = false
 
     local bossIds = {
@@ -99,24 +99,25 @@ return function(tab)
         print("DEBUG: Auto farm loop stopped.")
     end
 
-    -- UI Section
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
 
-    -- Island Dropdown
     local islandDropdown = autoFarmTab:AddDropdown("IslandDropdown", {
         Title = "Select Island",
+        Description = "Select the island you want to fight at.",
         Values = { "Island 1", "Island 2", "Island 3" },
+        Default = { "Island 1" },
         Callback = function(value)
             selectedIsland = value
             print("DEBUG: Selected island:", selectedIsland)
         end
     })
-
-    -- Difficulty Dropdown
+    
     local difficultyDropdown = autoFarmTab:AddDropdown("DifficultyDropdown", {
         Title = "Select Difficulty",
-        Multi = true,
+        Description = "Select The Difficulty type you want to fight.",
         Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
+        Multi = true,
+        Default = {"Starter"},
         Callback = function(values)
             if values then
                 selectedDifficulties = values
@@ -128,17 +129,17 @@ return function(tab)
         end
     })
 
-    -- Farming Method Dropdown
     local methodDropdown = autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
-        Values = { "Beside", "Below" },
+        Description = "Select one to make that your farming method.",
+        Values = {"Beside", "Below"},
+        Default = {"Beside"},
         Callback = function(value)
             farmingMethod = value
             print("DEBUG: Selected farming method:", farmingMethod)
         end
     })
 
-    -- Farming Distance Slider
     local farmingDistanceSlider = autoFarmTab:AddSlider("FarmingDistanceSlider", {
         Title = "Farming Distance",
         Min = -20,
@@ -151,7 +152,6 @@ return function(tab)
         end
     })
 
-    -- Auto Farm Toggle
     local autoFarmToggle = autoFarmTab:AddToggle("AutoFarmToggle", {
         Title = "Auto Farm",
         Default = false,
