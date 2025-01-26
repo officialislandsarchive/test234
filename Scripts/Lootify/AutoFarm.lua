@@ -41,202 +41,198 @@ return function(tab)
         end
     end
 
-    local function checkCooldown(boss)
-        local npcFolder = workspace:FindFirstChild("NPCs")
-        if not npcFolder then
-            print("ERROR: NPCs folder not found in Workspace.")
-            return false
-        end
-
-        local npcModel = npcFolder:FindFirstChild(boss.Name)
-        if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
-            local billboard = npcModel.HumanoidRootPart:FindFirstChild("BillboardGui")
-            if billboard then
-                               local frame = billboard:FindFirstChild("Frame")
-                if frame then
-                    local cooldownLabel = frame:FindFirstChild("CD")
-                    if cooldownLabel and tonumber(cooldownLabel.Text) == 0 then
-                        print("DEBUG: Cooldown is 0 for boss:", boss.Name)
-                        return true
-                    end
-                end
-            end
-        else
-            print("WARNING: Boss model not found. Teleporting to ensure proximity.")
-            teleportToBoss(boss)
-        end
-        return false
-    end
-
-    local function startBossFight(boss)
-        local npcFolder = workspace:FindFirstChild("NPCs")
-        local npcModel = npcFolder and npcFolder:FindFirstChild(boss.Name)
-
-        if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
-            local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                print("DEBUG: Moving to NPC to start raid:", boss.Name)
-                hrp.CFrame = npcModel.HumanoidRootPart.CFrame
-                task.wait(1)
-            end
-        else
-            print("WARNING: NPC not found in folder, teleporting to saved location for:", boss.Name)
-            teleportToBoss(boss)
-        end
-
-        if checkCooldown(boss) then
-            game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
-            print("DEBUG: Remote triggered for boss:", boss.Name)
-            task.wait(10)
-        else
-            print("DEBUG: Raid not started due to cooldown.")
-        end
-    end
-
-    local function farmBosses()
-        print("DEBUG: Auto farm loop started.")
-        while autoFarmEnabled do
-            if not selectedIsland then
-                print("ERROR: No island selected.")
-                break
-            end
-
-            if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
-                print("ERROR: No difficulties selected.")
-                break
-            end
-
-            for _, difficulty in ipairs(selectedDifficulties) do
-                local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
-                if boss then
-                    print("DEBUG: Preparing to join raid for:", boss.Name)
-                    startBossFight(boss)
-
-                    local enemyFolder = workspace:FindFirstChild("Enemy")
-                    if enemyFolder and #enemyFolder:GetChildren() > 0 then
-                        for _, enemy in ipairs(enemyFolder:GetChildren()) do
-                            if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
-                                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                                if hrp then
-                                    print("DEBUG: Attacking enemy:", enemy.Name)
-                                    while enemy.Humanoid.Health > 0 and autoFarmEnabled do
-                                        hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
-                                        mouse1click()  -- Ensure mouse1click is defined elsewhere in your code
-                                        task.wait(0.1)
-                                    end
-                                end
-                            end
-                        end
-                    else
-                        print("WARNING: No enemies found, checking for boss...")
-                        local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region
-                        if regionUI.Normal.Visible then
-                            print("DEBUG: Normal stage detected, farming enemies.")
-                        elseif regionUI.Boss.Visible then
-                            print("DEBUG: Boss stage detected, teleporting.")
-                            teleportToBoss(boss)
-                        end
+	local function checkCooldown(boss)
+		local npcFolder = workspace:FindFirstChild("NPCs")
+		if not npcFolder then
+			print("ERROR: NPCs folder not found in Workspace.")
+			return false
+		end
+	
+		local npcModel = npcFolder:FindFirstChild(boss.Name)
+		if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
+			local billboard = npcModel.HumanoidRootPart:FindFirstChild("BillboardGui")
+			if billboard then
+				local frame = billboard:FindFirstChild("Frame")
+				if frame then
+					local cooldownLabel = frame:FindFirstChild("CD")
+					if cooldownLabel then
+						local cooldownTime = tonumber(cooldownLabel.Text)
+						if cooldownTime and cooldownTime == 0 then
+							print("DEBUG: Cooldown is 0 for boss:", boss.Name)
+							return true
+						else
+							print("DEBUG: Cooldown is not 0 for boss:", boss.Name, "Waiting for", cooldownTime, "seconds.")
+							task.wait(cooldownTime)
+						end
+					end
+				end
+			end
+		else
+			print("WARNING: Boss model not found. Teleporting to ensure proximity.")
+			teleportToBoss(boss)
+		end
+		return false
+	end
+	
+	local function checkDungeonStage()
+		local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region
+		if regionUI.Normal.Visible then
+			print("DEBUG: Normal stage detected.")
+			return "Normal"
+		elseif regionUI.Boss.Visible then
+			print("DEBUG: Boss stage detected.")
+			return "Boss"
+		end
+		return nil
+	end
+	
+	local function startBossFight(boss)
+		local npcFolder = workspace:FindFirstChild("NPCs")
+		local npcModel = npcFolder and npcFolder:FindFirstChild(boss.Name)
+	
+		if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
+			local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				print("DEBUG: Moving to NPC to start raid:", boss.Name)
+				hrp.CFrame = npcModel.HumanoidRootPart.CFrame
+				task.wait(1)
+			end
+		else
+			print("WARNING: NPC not found in folder, teleporting to saved location for:", boss.Name)
+			teleportToBoss(boss)
+		end
+	
+		if checkCooldown(boss) then
+			local stage = checkDungeonStage()
+			if stage == "Normal" or stage == "Boss" then
+				game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
+				print("DEBUG: Remote triggered for boss:", boss.Name)
+				task.wait(10)
+			else
+				print("DEBUG: Not in a valid stage to start the boss fight.")
+			end
+		else
+			print("DEBUG: Raid not started due to cooldown.")
+		end
+	end
+	
+	local function farmBosses()
+		print("DEBUG: Auto farm loop started.")
+		while autoFarmEnabled do
+			if not selectedIsland then
+				print("ERROR: No island selected.")
+				break
+			end
+	
+			if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
+				print("ERROR: No difficulties selected.")
+				break
+			end
+	
+			for _, difficulty in ipairs(selectedDifficulties) do
+				local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
+				if boss then
+					print("DEBUG: Preparing to join raid for:", boss.Name)
+					startBossFight(boss)
+	
+					local enemyFolder = workspace:FindFirstChild("Enemy")
+					if enemyFolder and #enemyFolder:GetChildren() > 0 then
+						for _, enemy in ipairs(enemyFolder:GetChildren()) do
+							if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
+								local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+								if hrp then
+									print("DEBUG: Attacking enemy:", enemy.Name)
+									while enemy.Humanoid.Health > 0 and autoFarmEnabled do
+										hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
+										mouse1click()
+										task.wait(0.1)
+									end
+								end
+							end
+						end
                     end
                 else
-                    print("ERROR: No boss found for difficulty:", difficulty)
-                end
-            end
-            task.wait(1)
-        end
-        print("DEBUG: Auto farm loop stopped.")
-    end
-
-local function attackEnemies()
-    local enemyFolder = workspace:FindFirstChild("Enemy")
-    if enemyFolder and #enemyFolder:GetChildren() > 0 then
-        for _, enemy in ipairs(enemyFolder:GetChildren()) do
-            if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
-                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if hrp then
-                    print("DEBUG: Attacking enemy:", enemy.Name)
-                    while enemy.Humanoid.Health > 0 and autoFarmEnabled do
-                        hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
-                        mouse1click()
-                        task.wait(0.1)
+                    print("WARNING: No enemies found, checking for boss...")
+                    local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region
+                    if regionUI.Normal.Visible then
+                        print("DEBUG: Normal stage detected, farming enemies.")
+                    elseif regionUI.Boss.Visible then
+                        print("DEBUG: Boss stage detected, teleporting.")
+                        teleportToBoss(boss)
                     end
                 end
+            else
+                print("ERROR: No boss found for difficulty:", difficulty)
             end
         end
-    else
-        print("WARNING: No enemies found. Moving to boss.")
-        if selectedIsland and selectedDifficulties[1] then
-            local boss = bossIds[selectedIsland][selectedDifficulties[1]]
-            if boss then
-                teleportToBoss(boss)
-            end
+        task.wait(1)
+    end
+    print("DEBUG: Auto farm loop stopped.")
+end
+
+local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
+
+autoFarmTab:AddDropdown("IslandDropdown", {
+    Title = "Select Island",
+    Description = "Select the island you want to fight at.",
+    Values = { "Island 1", "Island 2", "Island 3" },
+    Default = "Island 1",
+    Callback = function(value)
+        selectedIsland = value
+        print("DEBUG: Selected island:", selectedIsland)
+    end
+})
+
+autoFarmTab:AddDropdown("DifficultyDropdown", {
+    Title = "Select Difficulty",
+    Description = "Select The Difficulty type you want to fight.",
+    Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
+    Multi = true,
+    Default = { "Starter", "Medium" },
+    Callback = function(values)
+        selectedDifficulties = values and #values > 0 and values or { "Starter", "Medium" }
+        print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
+    end
+})
+
+task.defer(function()
+    if #selectedDifficulties == 0 then
+        selectedDifficulties = { "Starter", "Medium" }
+    end
+end)
+
+autoFarmTab:AddDropdown("MethodDropdown", {
+    Title = "Select Method",
+    Description = "Select one to make that your farming method.",
+    Values = { "Beside", "Below" },
+    Default = "Beside",
+    Callback = function(value)
+        farmingMethod = value
+        print("DEBUG: Selected farming method:", farmingMethod)
+    end
+})
+
+autoFarmTab:AddSlider("FarmingDistanceSlider", {
+    Title = "Farming Distance",
+    Min = -20,
+    Max = 0,
+    Default = -5,
+    Rounding = 0,
+    Callback = function(value)
+        farmingDistance = value
+        print("DEBUG: Farming distance set to:", farmingDistance)
+    end
+})
+
+autoFarmTab:AddToggle("Auto Farm", {
+    Title = "Auto Farm",
+    Default = false,
+    Callback = function(value)
+        if autoFarmEnabled == value then return end
+        autoFarmEnabled = value
+        print("DEBUG: Auto farm toggled:", autoFarmEnabled)
+        if autoFarmEnabled then
+            task.spawn(farmBosses)
         end
     end
-end
-    -- UI Setup
-    local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
-
-    autoFarmTab:AddDropdown("IslandDropdown", {
-        Title = "Select Island",
-        Description = "Select the island you want to fight at.",
-        Values = { "Island 1", "Island 2", "Island 3" },
-        Default = "Island 1",
-        Callback = function(value)
-            selectedIsland = value
-            print("DEBUG: Selected island:", selectedIsland)
-        end
-    })
-
-    autoFarmTab:AddDropdown("DifficultyDropdown", {
-        Title = "Select Difficulty",
-        Description = "Select The Difficulty type you want to fight.",
-        Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
-        Multi = true,
-        Default = { "Starter", "Medium" },
-        Callback = function(values)
-            selectedDifficulties = values and #values > 0 and values or { "Starter", "Medium" }
-            print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
-        end
-    })
-
-    task.defer(function()
-        if #selectedDifficulties == 0 then
-            selectedDifficulties = { "Starter", "Medium" }
-        end
-    end)
-
-    autoFarmTab:AddDropdown("MethodDropdown", {
-        Title = "Select Method",
-        Description = "Select one to make that your farming method.",
-        Values = { "Beside", "Below" },
-        Default = "Beside",
-        Callback = function(value)
-            farmingMethod = value
-            print("DEBUG: Selected farming method:", farmingMethod)
-        end
-    })
-
-    autoFarmTab:AddSlider("FarmingDistanceSlider", {
-        Title = "Farming Distance",
-        Min = -20,
-        Max = 0,
-        Default = -5,
-        Rounding = 0,
-        Callback = function(value)
-            farmingDistance = value
-            print("DEBUG: Farming distance set to:", farmingDistance)
-        end
-    })
-
-    autoFarmTab:AddToggle("Auto Farm", {
-        Title = "Auto Farm",
-        Default = false,
-        Callback = function(value)
-            if autoFarmEnabled == value then return end
-            autoFarmEnabled = value
-            print("DEBUG: Auto farm toggled:", autoFarmEnabled)
-            if autoFarmEnabled then
-                task.spawn(farmBosses)
-            end
-        end
-    })
-end
+})
