@@ -2,7 +2,7 @@ return function(tab)
     local selectedIsland = nil
     local selectedDifficulties = {}
     local farmingMethod = nil
-    local farmingDistance = 0
+    local farmingDistance = -5
     local autoFarmEnabled = false
     local bossIds = {
         ["Island 1"] = {
@@ -102,7 +102,7 @@ return function(tab)
         Multi = true,
         List = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Callback = function(values)
-            selectedDifficulties = values
+            selectedDifficulties = values or {}
             print("Selected difficulties:", table.concat(selectedDifficulties, ", "))
         end
     })
@@ -120,7 +120,7 @@ return function(tab)
         Title = "Farming Distance",
         Min = -20,
         Max = 0,
-        Default = 0,
+        Default = -5,
         Rounding = 0,
         Callback = function(value)
             farmingDistance = value
