@@ -149,7 +149,6 @@ return function(tab)
 									end
 								end
 							end
-						end
                     end
                 else
                     print("WARNING: No enemies found, checking for boss...")
