@@ -116,39 +116,39 @@ return function(tab)
 		end
 	end
 	
-	local function farmBosses()
-		print("DEBUG: Auto farm loop started.")
-		while autoFarmEnabled do
-			if not selectedIsland then
-				print("ERROR: No island selected.")
-				break
-			end
-	
-			if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
-				print("ERROR: No difficulties selected.")
-				break
-			end
-	
-			for _, difficulty in ipairs(selectedDifficulties) do
-				local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
-				if boss then
-					print("DEBUG: Preparing to join raid for:", boss.Name)
-					startBossFight(boss)
-	
-					local enemyFolder = workspace:FindFirstChild("Enemy")
-					if enemyFolder and #enemyFolder:GetChildren() > 0 then
-						for _, enemy in ipairs(enemyFolder:GetChildren()) do
-							if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
-								local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-								if hrp then
-									print("DEBUG: Attacking enemy:", enemy.Name)
-									while enemy.Humanoid.Health > 0 and autoFarmEnabled do
-										hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
-										mouse1click()
-										task.wait(0.1)
-									end
-								end
-							end
+local function farmBosses()
+    print("DEBUG: Auto farm loop started.")
+    while autoFarmEnabled do
+        if not selectedIsland then
+            print("ERROR: No island selected.")
+            break
+        end
+
+        if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
+            print("ERROR: No difficulties selected.")
+            break
+        end
+
+        for _, difficulty in ipairs(selectedDifficulties) do
+            local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
+            if boss then
+                print("DEBUG: Preparing to join raid for:", boss.Name)
+                startBossFight(boss)
+
+                local enemyFolder = workspace:FindFirstChild("Enemy")
+                if enemyFolder and #enemyFolder:GetChildren() > 0 then
+                    for _, enemy in ipairs(enemyFolder:GetChildren()) do
+                        if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
+                            local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if hrp then
+                                print("DEBUG: Attacking enemy:", enemy.Name)
+                                while enemy.Humanoid.Health > 0 and autoFarmEnabled do
+                                    hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
+                                    mouse1click()
+                                    task.wait(0.1)
+                                end
+                            end
+                        end
                     end
                 else
                     print("WARNING: No enemies found, checking for boss...")
