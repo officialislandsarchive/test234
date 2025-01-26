@@ -117,7 +117,6 @@ return function(tab)
         Description = "Select The Difficulty type you want to fight.",
         Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Multi = true,
-        Default = "Starter",
         Callback = function(values)
             if values then
                 selectedDifficulties = values
