@@ -30,16 +30,21 @@ return function(tab)
     }
 
     local function startBossFight(bossId)
-        local cooldown = game:GetService("ReplicatedStorage").Remotes.Region.Cooldown[bossId]
+        print("Attempting to start boss fight with ID:", bossId)
+        local cooldown = game:GetService("ReplicatedStorage").Remotes.Region.Cooldown:FindFirstChild(tostring(bossId))
         if cooldown and cooldown.Value == 0 then
             local args = { bossId }
             game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(unpack(args))
+            print("Successfully fired remote for boss ID:", bossId)
+        else
+            print("Boss fight cooldown is not ready for ID:", bossId)
         end
     end
 
     local function farmBosses()
         while autoFarmEnabled do
-            if selectedIsland and #selectedDifficulties > 0 then
+            print("Auto farm is running...")
+            if selectedIsland and type(selectedDifficulties) == "table" and #selectedDifficulties > 0 then
                 for _, difficulty in ipairs(selectedDifficulties) do
                     local bossId = bossIds[selectedIsland][difficulty]
                     if bossId then
@@ -55,21 +60,30 @@ return function(tab)
                             end
                             if npc then
                                 local player = game.Players.LocalPlayer
-                                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                                local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                                 if hrp then
                                     hrp.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
                                     mouse1click()
+                                    print("Attacking NPC:", npc.Name, "at distance:", farmingDistance)
+                                else
+                                    print("Error: HumanoidRootPart not found for player.")
                                 end
                                 task.wait(0.1)
                             else
+                                print("All NPCs defeated for boss ID:", bossId)
                                 break
                             end
                         end
+                    else
+                        print("Invalid boss ID for difficulty:", difficulty, "on island:", selectedIsland)
                     end
                 end
+            else
+                print("Error: No island or difficulties selected.")
             end
             task.wait(0.5)
         end
+        print("Auto farm stopped.")
     end
 
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
@@ -79,6 +93,7 @@ return function(tab)
         List = { "Island 1", "Island 2", "Island 3" },
         Callback = function(value)
             selectedIsland = value
+            print("Selected island:", selectedIsland)
         end
     })
 
@@ -88,6 +103,7 @@ return function(tab)
         List = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Callback = function(values)
             selectedDifficulties = values
+            print("Selected difficulties:", table.concat(selectedDifficulties, ", "))
         end
     })
 
@@ -96,6 +112,7 @@ return function(tab)
         List = { "Beside", "Below" },
         Callback = function(value)
             farmingMethod = value
+            print("Selected farming method:", farmingMethod)
         end
     })
 
@@ -107,6 +124,7 @@ return function(tab)
         Rounding = 0,
         Callback = function(value)
             farmingDistance = value
+            print("Farming distance set to:", farmingDistance)
         end
     })
 
@@ -115,6 +133,7 @@ return function(tab)
         Default = false,
         Callback = function(value)
             autoFarmEnabled = value
+            print("Auto farm toggled:", autoFarmEnabled)
             if autoFarmEnabled then
                 task.spawn(farmBosses)
             end
