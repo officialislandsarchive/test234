@@ -5,33 +5,7 @@ return function(tab)
     local farmingMethod = nil
     local farmingDistance = -5 -- Default distance
     local autoFarmEnabled = false
-
-    -- Boss ID mapping
-    local bossIds = {
-        ["Island 1"] = {
-            Starter = 101002,
-            Medium = 101003,
-            Hard = 101004,
-            Extreme = 101005,
-            ["Final Boss"] = 101006
-        },
-        ["Island 2"] = {
-            Starter = 101007,
-            Medium = 101008,
-            Hard = 101009,
-            Extreme = 101010,
-            ["Final Boss"] = 101011,
-            ["Secret Challenge"] = 101012
-        },
-        ["Island 3"] = {
-            Starter = 101013,
-            Medium = 101014,
-            Hard = 101015,
-            Extreme = 101016,
-            ["Final Boss"] = 101017
-        }
-    }
-
+    
     -- Function to safely start a boss fight
     local function startBossFight(bossId)
         print("Attempting to start boss fight with ID:", bossId)
@@ -103,16 +77,6 @@ return function(tab)
 
     -- UI Section
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
-
-    -- Island Dropdown
-    local islandDropdown = autoFarmTab:AddDropdown("IslandDropdown", {
-        Title = "Select Island",
-        Value = { "Island 1", "Island 2", "Island 3" },
-        Callback = function(value)
-            selectedIsland = value
-            print("Selected island:", selectedIsland)
-        end
-    })
 
     -- Difficulty Dropdown
     local difficultyDropdown = autoFarmTab:AddDropdown("DifficultyDropdown", {
