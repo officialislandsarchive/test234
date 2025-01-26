@@ -33,9 +33,11 @@ return function(tab)
 local function teleportToBoss(boss)
     local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if hrp then
-        print("DEBUG: Moving to boss start location:", boss.Name)
+        print("DEBUG: Teleporting to NPC location for raid start:", boss.Name)
         hrp.CFrame = CFrame.new(boss.Location)
         task.wait(1)
+    else
+        print("ERROR: Failed to teleport, HumanoidRootPart missing.")
     end
 end
 
@@ -66,12 +68,27 @@ end
     end
 
 local function startBossFight(boss)
-    if boss and checkCooldown(boss) then
-        print("DEBUG: Cooldown ready, starting boss fight:", boss.Name)
+    local npcFolder = workspace:FindFirstChild("NPCs")
+    local npcModel = npcFolder and npcFolder:FindFirstChild(boss.Name)
+    
+    if npcModel and npcModel:FindFirstChild("HumanoidRootPart") then
+        local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            print("DEBUG: Moving to NPC to start raid:", boss.Name)
+            hrp.CFrame = npcModel.HumanoidRootPart.CFrame
+            task.wait(1)
+        end
+    else
+        print("WARNING: NPC not found in folder, teleporting to saved location for:", boss.Name)
+        teleportToBoss(boss)
+    end
+
+    if checkCooldown(boss) then
         game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
+        print("DEBUG: Remote triggered for boss:", boss.Name)
         task.wait(10)
     else
-        print("DEBUG: Boss fight not started due to cooldown.")
+        print("DEBUG: Raid not started due to cooldown.")
     end
 end
 
@@ -91,23 +108,31 @@ local function farmBosses()
         for _, difficulty in ipairs(selectedDifficulties) do
             local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
             if boss then
-                print("DEBUG: Attempting boss fight for:", boss.Name)
-                
-                if checkCooldown(boss) then
-                    teleportToBoss(boss)
-                    game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
-                    task.wait(10)
+                print("DEBUG: Preparing to join raid for:", boss.Name)
+                startBossFight(boss)
 
-                    attackEnemies()
-                    
-                    local gui = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal.Frame
-                    if not gui.Visible and gui.Parent.Boss.Visible then
-                        print("DEBUG: Final boss detected. Moving in.")
-                        teleportToBoss(boss)
+                local enemyFolder = workspace:FindFirstChild("Enemy")
+                if enemyFolder and #enemyFolder:GetChildren() > 0 then
+                    for _, enemy in ipairs(enemyFolder:GetChildren()) do
+                        if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
+                            local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if hrp then
+                                print("DEBUG: Attacking enemy:", enemy.Name)
+                                while enemy.Humanoid.Health > 0 and autoFarmEnabled do
+                                    hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
+                                    mouse1click()
+                                    task.wait(0.1)
+                                end
+                            end
+                        end
                     end
                 else
-                    print("DEBUG: Cooldown not ready, waiting...")
-                    task.wait(5)
+                    print("WARNING: No enemies found, checking for boss...")
+                    local regionUI = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal
+                    if not regionUI.Visible and regionUI.Parent.Boss.Visible then
+                        print("DEBUG: Boss stage detected, teleporting.")
+                        teleportToBoss(boss)
+                    end
                 end
             else
                 print("ERROR: No boss found for difficulty:", difficulty)
@@ -160,7 +185,7 @@ autoFarmTab:AddDropdown("DifficultyDropdown", {
     Multi = true,
     Default = { "Starter", "Medium" },
     Callback = function(values)
-        selectedDifficulties = #values > 0 and values or { "Starter", "Medium" }
+        selectedDifficulties = values and #values > 0 and values or { "Starter", "Medium" }
         print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
     end
 })
@@ -168,10 +193,9 @@ autoFarmTab:AddDropdown("DifficultyDropdown", {
 task.defer(function()
     if #selectedDifficulties == 0 then
         selectedDifficulties = { "Starter", "Medium" }
-        print("DEBUG: Default difficulties applied.")
     end
 end)
-
+    
     autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
         Description = "Select one to make that your farming method.",
