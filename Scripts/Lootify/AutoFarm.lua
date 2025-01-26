@@ -1,9 +1,12 @@
 return function(tab)
+    -- Initialize variables with safe defaults
     local selectedIsland = nil
-    local selectedDifficulties = {}
+    local selectedDifficulties = {} -- Always initialized as a table
     local farmingMethod = nil
-    local farmingDistance = -5
+    local farmingDistance = -5 -- Default distance
     local autoFarmEnabled = false
+
+    -- Boss ID mapping
     local bossIds = {
         ["Island 1"] = {
             Starter = 101002,
@@ -29,6 +32,7 @@ return function(tab)
         }
     }
 
+    -- Function to safely start a boss fight
     local function startBossFight(bossId)
         print("Attempting to start boss fight with ID:", bossId)
         local cooldown = game:GetService("ReplicatedStorage").Remotes.Region.Cooldown:FindFirstChild(tostring(bossId))
@@ -41,53 +45,66 @@ return function(tab)
         end
     end
 
+    -- Main farming loop
     local function farmBosses()
         while autoFarmEnabled do
             print("Auto farm is running...")
-            if selectedIsland and type(selectedDifficulties) == "table" and #selectedDifficulties > 0 then
-                for _, difficulty in ipairs(selectedDifficulties) do
-                    local bossId = bossIds[selectedIsland][difficulty]
-                    if bossId then
-                        startBossFight(bossId)
-                        local npc = nil
-                        while true do
-                            npc = nil
-                            for _, v in pairs(workspace:GetDescendants()) do
-                                if v:IsA("Model") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
-                                    npc = v
-                                    break
-                                end
-                            end
-                            if npc then
-                                local player = game.Players.LocalPlayer
-                                local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                if hrp then
-                                    hrp.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
-                                    mouse1click()
-                                    print("Attacking NPC:", npc.Name, "at distance:", farmingDistance)
-                                else
-                                    print("Error: HumanoidRootPart not found for player.")
-                                end
-                                task.wait(0.1)
-                            else
-                                print("All NPCs defeated for boss ID:", bossId)
+
+            -- Validate selections
+            if not selectedIsland then
+                print("Error: No island selected.")
+                break
+            end
+
+            if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
+                print("Error: No difficulties selected.")
+                break
+            end
+
+            for _, difficulty in ipairs(selectedDifficulties) do
+                local bossId = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
+                if bossId then
+                    startBossFight(bossId)
+                    local npc = nil
+                    while true do
+                        -- Find a valid NPC to attack
+                        npc = nil
+                        for _, v in pairs(workspace:GetDescendants()) do
+                            if v:IsA("Model") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
+                                npc = v
                                 break
                             end
                         end
-                    else
-                        print("Invalid boss ID for difficulty:", difficulty, "on island:", selectedIsland)
+
+                        if npc then
+                            local player = game.Players.LocalPlayer
+                            local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                            if hrp then
+                                hrp.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
+                                mouse1click()
+                                print("Attacking NPC:", npc.Name, "at distance:", farmingDistance)
+                            else
+                                print("Error: HumanoidRootPart not found for player.")
+                            end
+                            task.wait(0.1)
+                        else
+                            print("All NPCs defeated for boss ID:", bossId)
+                            break
+                        end
                     end
+                else
+                    print("Invalid boss ID for difficulty:", difficulty, "on island:", selectedIsland)
                 end
-            else
-                print("Error: No island or difficulties selected.")
             end
             task.wait(0.5)
         end
         print("Auto farm stopped.")
     end
 
+    -- UI Section
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
 
+    -- Island Dropdown
     local islandDropdown = autoFarmTab:AddDropdown("IslandDropdown", {
         Title = "Select Island",
         List = { "Island 1", "Island 2", "Island 3" },
@@ -97,16 +114,23 @@ return function(tab)
         end
     })
 
+    -- Difficulty Dropdown
     local difficultyDropdown = autoFarmTab:AddDropdown("DifficultyDropdown", {
         Title = "Select Difficulty",
         Multi = true,
         List = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Callback = function(values)
-            selectedDifficulties = values or {}
-            print("Selected difficulties:", table.concat(selectedDifficulties, ", "))
+            if values then
+                selectedDifficulties = values
+                print("Selected difficulties:", table.concat(selectedDifficulties, ", "))
+            else
+                selectedDifficulties = {}
+                print("No difficulties selected.")
+            end
         end
     })
 
+    -- Farming Method Dropdown
     local methodDropdown = autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
         List = { "Beside", "Below" },
@@ -116,6 +140,7 @@ return function(tab)
         end
     })
 
+    -- Farming Distance Slider
     local farmingDistanceSlider = autoFarmTab:AddSlider("FarmingDistanceSlider", {
         Title = "Farming Distance",
         Min = -20,
@@ -128,6 +153,7 @@ return function(tab)
         end
     })
 
+    -- Auto Farm Toggle
     local autoFarmToggle = autoFarmTab:AddToggle("AutoFarmToggle", {
         Title = "Auto Farm",
         Default = false,
