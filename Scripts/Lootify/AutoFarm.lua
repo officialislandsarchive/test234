@@ -170,6 +170,7 @@ return function(tab)
 end
 
 local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
+print("DEBUG: Auto Farm tab created.")
 
 autoFarmTab:AddDropdown("IslandDropdown", {
     Title = "Select Island",
