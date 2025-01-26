@@ -78,59 +78,67 @@ return function(tab)
         end
     end
 
-    local function farmBosses()
-        print("DEBUG: Auto farm loop started.")
-        while autoFarmEnabled do
-            if not selectedIsland then
-                print("ERROR: No island selected.")
-                break
-            end
+local function farmBosses()
+    print("DEBUG: Auto farm loop started.")
+    while autoFarmEnabled do
+        if not selectedIsland then
+            print("ERROR: No island selected.")
+            break
+        end
 
-            if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
-                print("ERROR: No difficulties selected.")
-                break
-            end
+        if type(selectedDifficulties) ~= "table" or #selectedDifficulties == 0 then
+            print("ERROR: No difficulties selected.")
+            break
+        end
 
-            for _, difficulty in ipairs(selectedDifficulties) do
-                local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
-                if boss then
-                    print("DEBUG: Starting boss fight for:", boss.Name)
-                    startBossFight(boss)
+        for _, difficulty in ipairs(selectedDifficulties) do
+            local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
+            if boss then
+                print("DEBUG: Starting boss fight for:", boss.Name)
+                local args = { boss.Id }
+                game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(unpack(args))
+                task.wait(10)
 
-                    local npc = nil
-                    while true do
-                        npc = nil
-                        for _, v in pairs(workspace:GetDescendants()) do
-                            if v:IsA("Model") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
-                                npc = v
-                                break
-                            end
-                        end
-
-                        if npc then
-                            print("DEBUG: Attacking NPC:", npc.Name)
+                local enemyFolder = workspace:FindFirstChild("Enemy")
+                if enemyFolder then
+                    for _, enemy in ipairs(enemyFolder:GetChildren()) do
+                        if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
                             local player = game.Players.LocalPlayer
                             local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                             if hrp then
-                                hrp.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
-                                mouse1click()
-                                task.wait(0.1)
-                            else
-                                print("ERROR: HumanoidRootPart not found for player.")
+                                print("DEBUG: Attacking enemy:", enemy.Name)
+                                while enemy.Humanoid.Health > 0 do
+                                    hrp.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
+                                    mouse1click()
+                                    task.wait(0.1)
+                                end
                             end
-                        else
-                            print("DEBUG: All NPCs defeated for boss:", boss.Name)
-                            break
                         end
                     end
                 else
-                    print("ERROR: No boss found for difficulty:", difficulty)
+                    print("WARNING: No enemies found. Moving to boss.")
+                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.CFrame = CFrame.new(boss.Location)
+                    end
                 end
+
+                local gui = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal.Frame
+                if not gui.Visible and gui.Parent.Boss.Visible then
+                    print("DEBUG: Boss detected. Moving to boss location.")
+                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.CFrame = CFrame.new(boss.Location)
+                    end
+                end
+            else
+                print("ERROR: No boss found for difficulty:", difficulty)
             end
-            task.wait(1)
         end
-        print("DEBUG: Auto farm loop stopped.")
+        task.wait(1)
     end
+    print("DEBUG: Auto farm loop stopped.")
+end
 
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
 
