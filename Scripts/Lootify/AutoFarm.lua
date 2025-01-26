@@ -30,17 +30,14 @@ return function(tab)
         }
     }
 
-    local function teleportToBoss(boss)
-        local player = game.Players.LocalPlayer
-        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            print("DEBUG: Teleporting to boss:", boss.Name, "at location:", boss.Location)
-            hrp.CFrame = CFrame.new(boss.Location)
-            task.wait(1)
-        else
-            print("ERROR: HumanoidRootPart not found for player.")
-        end
+local function teleportToBoss(boss)
+    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        print("DEBUG: Moving to boss start location:", boss.Name)
+        hrp.CFrame = CFrame.new(boss.Location)
+        task.wait(1)
     end
+end
 
     local function checkCooldown(boss)
         local npcFolder = workspace:FindFirstChild("NPCs")
@@ -68,15 +65,15 @@ return function(tab)
         return false
     end
 
-    local function startBossFight(boss)
-        if boss and checkCooldown(boss) then
-            local args = { boss.Id }
-            game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(unpack(args))
-            print("DEBUG: Fired remote for boss:", boss.Name, "with ID:", boss.Id)
-        else
-            print("DEBUG: Boss fight not started due to cooldown or missing boss.")
-        end
+local function startBossFight(boss)
+    if boss and checkCooldown(boss) then
+        print("DEBUG: Cooldown ready, starting boss fight:", boss.Name)
+        game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
+        task.wait(10)
+    else
+        print("DEBUG: Boss fight not started due to cooldown.")
     end
+end
 
 local function farmBosses()
     print("DEBUG: Auto farm loop started.")
@@ -94,42 +91,23 @@ local function farmBosses()
         for _, difficulty in ipairs(selectedDifficulties) do
             local boss = bossIds[selectedIsland] and bossIds[selectedIsland][difficulty]
             if boss then
-                print("DEBUG: Starting boss fight for:", boss.Name)
-                local args = { boss.Id }
-                game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(unpack(args))
-                task.wait(10)
+                print("DEBUG: Attempting boss fight for:", boss.Name)
+                
+                if checkCooldown(boss) then
+                    teleportToBoss(boss)
+                    game:GetService("ReplicatedStorage").Remotes.Region.EnterRegion:FireServer(boss.Id)
+                    task.wait(10)
 
-                local enemyFolder = workspace:FindFirstChild("Enemy")
-                if enemyFolder then
-                    for _, enemy in ipairs(enemyFolder:GetChildren()) do
-                        if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
-                            local player = game.Players.LocalPlayer
-                            local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                            if hrp then
-                                print("DEBUG: Attacking enemy:", enemy.Name)
-                                while enemy.Humanoid.Health > 0 do
-                                    hrp.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, farmingDistance)
-                                    mouse1click()
-                                    task.wait(0.1)
-                                end
-                            end
-                        end
+                    attackEnemies()
+                    
+                    local gui = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal.Frame
+                    if not gui.Visible and gui.Parent.Boss.Visible then
+                        print("DEBUG: Final boss detected. Moving in.")
+                        teleportToBoss(boss)
                     end
                 else
-                    print("WARNING: No enemies found. Moving to boss.")
-                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        hrp.CFrame = CFrame.new(boss.Location)
-                    end
-                end
-
-                local gui = game.Players.LocalPlayer.PlayerGui.Main.Func.Region.Normal.Frame
-                if not gui.Visible and gui.Parent.Boss.Visible then
-                    print("DEBUG: Boss detected. Moving to boss location.")
-                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        hrp.CFrame = CFrame.new(boss.Location)
-                    end
+                    print("DEBUG: Cooldown not ready, waiting...")
+                    task.wait(5)
                 end
             else
                 print("ERROR: No boss found for difficulty:", difficulty)
@@ -138,6 +116,28 @@ local function farmBosses()
         task.wait(1)
     end
     print("DEBUG: Auto farm loop stopped.")
+end
+
+local function attackEnemies()
+    local enemyFolder = workspace:FindFirstChild("Enemy")
+    if enemyFolder and #enemyFolder:GetChildren() > 0 then
+        for _, enemy in ipairs(enemyFolder:GetChildren()) do
+            if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") then
+                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    print("DEBUG: Attacking enemy:", enemy.Name)
+                    while enemy.Humanoid.Health > 0 and autoFarmEnabled do
+                        hrp.CFrame = CFrame.lookAt(hrp.Position, enemy.HumanoidRootPart.Position) * CFrame.new(0, 0, farmingDistance)
+                        mouse1click()
+                        task.wait(0.1)
+                    end
+                end
+            end
+        end
+    else
+        print("WARNING: No enemies found. Moving to boss.")
+        teleportToBoss(boss)
+    end
 end
 
     local autoFarmTab = tab:AddSection("Auto Farm Dungeon")
@@ -153,21 +153,24 @@ end
         end
     })
 
-    autoFarmTab:AddDropdown("DifficultyDropdown", {
-        Title = "Select Difficulty",
-        Description = "Select The Difficulty type you want to fight.",
-        Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
-        Multi = true,
-        Default = { "Starter", "Medium" },
-        Callback = function(values)
-            if type(values) == "table" and #values > 0 then
-                selectedDifficulties = values
-            else
-                selectedDifficulties = { "Starter", "Medium" }
-            end
-            print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
-        end
-    })
+autoFarmTab:AddDropdown("DifficultyDropdown", {
+    Title = "Select Difficulty",
+    Description = "Select The Difficulty type you want to fight.",
+    Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
+    Multi = true,
+    Default = { "Starter", "Medium" },
+    Callback = function(values)
+        selectedDifficulties = #values > 0 and values or { "Starter", "Medium" }
+        print("DEBUG: Selected difficulties:", table.concat(selectedDifficulties, ", "))
+    end
+})
+
+task.defer(function()
+    if #selectedDifficulties == 0 then
+        selectedDifficulties = { "Starter", "Medium" }
+        print("DEBUG: Default difficulties applied.")
+    end
+end)
 
     autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
@@ -192,15 +195,15 @@ end
         end
     })
 
-    autoFarmTab:AddToggle("AutoFarmToggle", {
-        Title = "Auto Farm",
-        Default = false,
-        Callback = function(value)
-            autoFarmEnabled = value
-            print("DEBUG: Auto farm toggled:", autoFarmEnabled)
-            if autoFarmEnabled then
-                task.spawn(farmBosses)
-            end
+autoFarmTab:AddToggle("Auto Farm", {
+    Title = "Auto Farm",
+    Default = false,
+    Callback = function(value)
+        if autoFarmEnabled == value then return end
+        autoFarmEnabled = value
+        print("DEBUG: Auto farm toggled:", autoFarmEnabled)
+        if autoFarmEnabled then
+            task.spawn(farmBosses)
         end
-    })
-end
+    end
+})
