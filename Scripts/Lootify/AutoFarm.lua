@@ -173,6 +173,7 @@ return function(tab)
         Min = -20,
         Max = 0,
         Default = -5,
+        Rounding = 0,
         Callback = function(value)
             farmingDistance = value
             print("DEBUG: Farming distance set to:", farmingDistance)
