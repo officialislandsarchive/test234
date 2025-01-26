@@ -105,19 +105,19 @@ return function(tab)
         Title = "Select Island",
         Description = "Select the island you want to fight at.",
         Values = { "Island 1", "Island 2", "Island 3" },
-        Default = { "Island 1" },
+        Default = "Island 1",
         Callback = function(value)
             selectedIsland = value
             print("DEBUG: Selected island:", selectedIsland)
         end
     })
-    
+
     local difficultyDropdown = autoFarmTab:AddDropdown("DifficultyDropdown", {
         Title = "Select Difficulty",
         Description = "Select The Difficulty type you want to fight.",
         Values = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Multi = true,
-        Default = {"Starter"},
+        Default = "Starter",
         Callback = function(values)
             if values then
                 selectedDifficulties = values
@@ -132,8 +132,8 @@ return function(tab)
     local methodDropdown = autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
         Description = "Select one to make that your farming method.",
-        Values = {"Beside", "Below"},
-        Default = {"Beside"},
+        Values = { "Beside", "Below" },
+        Default = "Beside",
         Callback = function(value)
             farmingMethod = value
             print("DEBUG: Selected farming method:", farmingMethod)
