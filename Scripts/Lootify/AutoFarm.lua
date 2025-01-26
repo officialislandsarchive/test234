@@ -107,7 +107,7 @@ return function(tab)
     -- Island Dropdown
     local islandDropdown = autoFarmTab:AddDropdown("IslandDropdown", {
         Title = "Select Island",
-        List = { "Island 1", "Island 2", "Island 3" },
+        Value = { "Island 1", "Island 2", "Island 3" },
         Callback = function(value)
             selectedIsland = value
             print("Selected island:", selectedIsland)
@@ -118,7 +118,7 @@ return function(tab)
     local difficultyDropdown = autoFarmTab:AddDropdown("DifficultyDropdown", {
         Title = "Select Difficulty",
         Multi = true,
-        List = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
+        Value = { "Starter", "Medium", "Hard", "Extreme", "Final Boss", "Secret Challenge" },
         Callback = function(values)
             if values then
                 selectedDifficulties = values
@@ -133,7 +133,7 @@ return function(tab)
     -- Farming Method Dropdown
     local methodDropdown = autoFarmTab:AddDropdown("MethodDropdown", {
         Title = "Select Method",
-        List = { "Beside", "Below" },
+        Value = { "Beside", "Below" },
         Callback = function(value)
             farmingMethod = value
             print("Selected farming method:", farmingMethod)
