@@ -335,36 +335,6 @@ local function mainLoop()
     end
 end
 
-local function sendToMyWebLog(eggType)
-    local payload = {
-        userId = game.Players.LocalPlayer.UserId,
-        username = game.Players.LocalPlayer.Name,
-        runtime = math.floor(os.clock() - sessionStartTime),
-        jobId = game.JobId,
-        placeId = game.PlaceId,
-        executor = getExecutorType(),
-        eggType = eggType,
-        timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
-    }
-
-    local success, response = pcall(function()
-        return game:GetService("HttpService"):RequestAsync({
-            Url = "https://zynovascripts.xyz/track.php",
-            Method = "POST",
-            Headers = {
-                ["Content-Type"] = "application/json"
-            },
-            Body = HttpService:JSONEncode(payload)
-        })
-    end)
-
-    if success and response.Success then
-        print("Log sent to web successfully!")
-    else
-        warn("Failed to send log to web:", response)
-    end
-end
-
 local success, err = pcall(mainLoop)
 if not success then
     updateStatusGui(string.format("bad error broooooo %s", tostring(err):sub(1, 50)))
